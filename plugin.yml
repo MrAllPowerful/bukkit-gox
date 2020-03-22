@@ -1,0 +1,9 @@
+main: com.radiantai.gox.GoX
+version: 0.1
+name: GoX_Plugin
+
+commands:
+   go:
+      description: Main command executor of Go for players.
+   gom:
+      description: Main command executor of GoM for moderators.

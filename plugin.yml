@@ -1,9 +1,17 @@
 main: com.radiantai.gox.GoX
-version: 0.1
+version: 0.2
 name: GoX_Plugin
 
 commands:
    go:
-      description: Main command executor of Go for players.
+      description: Basic /go command.
    gom:
-      description: Main command executor of GoM for moderators.
+      description: Command /gom for plugin admins.
+      
+permissions:
+   GoX.Go:
+      description: Gives access to basic commands performed with /go
+      default: op
+   GoX.GoM:
+      description: Gives access to admin commands performed with /gom
+      default: op

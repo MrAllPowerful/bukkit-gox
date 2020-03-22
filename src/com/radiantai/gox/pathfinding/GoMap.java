@@ -2,26 +2,42 @@ package com.radiantai.gox.pathfinding;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+
+import com.radiantai.gox.GoX;
 
 public class GoMap {
 	private static List<GoNode> nodes = new ArrayList<GoNode>();
 	private static Map<String, GoStation> stations = new HashMap<String,GoStation>();
+	private static GoX plugin;
+	private static ConfigurationSection config;
+	private static Logger logger;
+	
+	public static void SetupPlugin(GoX setPlugin, Logger setLogger) {
+		plugin = setPlugin;
+		logger = setLogger;
+		config = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("other");
+	}
 	
 	public static void AddNode(GoNode node) {
 		nodes.add(node);
@@ -30,7 +46,7 @@ public class GoMap {
 	public static void AddNode(int x, int y, int z) throws Exception {
 		GoNode node = GoMap.GetNode(x, z);
 		if (node != null) {
-			throw new Exception("There is already a node/station at that location!");
+			throw new Exception(config.getString("already location"));
 		}
 		nodes.add(new GoNode(x, y, z));
 	}
@@ -44,10 +60,10 @@ public class GoMap {
 	public static void AddStation(String name, int x, int y, int z) throws Exception {
 		GoNode node = GoMap.GetNode(x, z);
 		if (node != null) {
-			throw new Exception("There is already a node/station at that location!");
+			throw new Exception(config.getString("already location"));
 		}
 		if (stations.get(name) != null) {
-			throw new Exception("There is already a station with the same name!");
+			throw new Exception(config.getString("already name"));
 		}
 		GoStation newst = new GoStation(name, x, y, z);
 		nodes.add(newst);
@@ -58,7 +74,7 @@ public class GoMap {
 		if (stations != null) {
 			GoStation st = stations.get(name);
 			if (st == null) {
-				throw new Exception("There is no such station!");
+				throw new Exception(config.getString("no such station"));
 			}
 			RemoveNodeP(st.getId());
 			stations.remove(name);
@@ -68,7 +84,7 @@ public class GoMap {
 	public static void RemoveNode(String id) throws Exception {
 		GoNode node = GetNode(id);
 		if (node instanceof GoStation) {
-			throw new Exception("You cannot remove node that is a station, use removestation command!");
+			throw new Exception(config.getString("cannot remove node"));
 		}
 		RemoveNodeP(id);
 	}
@@ -89,7 +105,7 @@ public class GoMap {
 				node.west.SetEast(null);
 			}
 			if (!nodes.removeIf(n -> (n.getId() == id))) {
-				throw new Exception("There is no such node!");
+				throw new Exception(config.getString("no such node"));
 			}
 		}
 	}
@@ -122,7 +138,7 @@ public class GoMap {
 	
 	public static void LinkNodes(GoNode from, GoNode to) throws Exception {
 		if (from.getX()==to.getX() && from.getZ()==to.getZ()) {
-			throw new Exception("You cannot link a node to itself!");
+			throw new Exception(config.getString("to itself"));
 		}
 		if (from.getZ()==to.getZ()) {
 			if (from.getX() > to.getX()) {
@@ -145,31 +161,31 @@ public class GoMap {
 			}
 		}
 		else {
-			throw new Exception("Linked nodes must lay on one line!");
+			throw new Exception(config.getString("one line"));
 		}
 	}
 	
 	public static void MessageNodes(Player player) {
-		player.sendMessage(ChatColor.AQUA+"Nodes:");
+		player.sendMessage(ChatColor.AQUA+config.getString("nodes"));
 		if (!nodes.isEmpty()) {
 			for (GoNode node : nodes) {
 				player.sendMessage(ChatColor.GREEN + " "+node.toString());
 			}
 		}
 		else {
-			player.sendMessage(ChatColor.YELLOW+"<empty>");
+			player.sendMessage(ChatColor.YELLOW+"<"+config.getString("empty")+">");
 		}
 	}
 	
 	public static void MessageStations(Player player) {
-		player.sendMessage(ChatColor.AQUA+"Stations:");
+		player.sendMessage(ChatColor.AQUA+config.getString("stations"));
 		if (!nodes.isEmpty()) {
 			for (GoStation st : new ArrayList<GoStation>(stations.values())) {
 				player.sendMessage(ChatColor.GREEN + " "+st.toString());
 			}
 		}
 		else {
-			player.sendMessage(ChatColor.RED+"<empty>");
+			player.sendMessage(ChatColor.RED+"<"+config.getString("empty")+">");
 		}
 	}
 	
@@ -201,8 +217,22 @@ public class GoMap {
 		return null;
 	}
 	
+	public static void BackupMap(String name) {
+		try {
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmSS");
+			
+			File source = new File(name);
+			File dest = new File(name+simpleDateFormat.format(new Date())+".backup");
+			
+			Files.copy(source.toPath(), dest.toPath(),
+	                StandardCopyOption.REPLACE_EXISTING);
+		}
+		catch (IOException e) {
+			logger.warning("An error occurred backing uo the map file! "+ e.getStackTrace());
+		}
+	}
+	
 	public static void ToFile(String name) {
-		Logger logger = Logger.getLogger("Minecraft");
 		try {
 		      FileWriter writer = new FileWriter(name);
 		      BufferedWriter nodeWriter = new BufferedWriter(writer);
@@ -230,13 +260,11 @@ public class GoMap {
 		      logger.info("Successfully wrote to the file.");
 	    }
 		catch (IOException e) {
-	      logger.warning("An error occurred.");
-	      e.printStackTrace();
+	      logger.warning("An error occurred writing out a map to the file! "+ e.getStackTrace());
 	    }
 	}
 	
 	public static void FromFile(String name) {
-		Logger logger = Logger.getLogger("Minecraft");
 		try {
             FileReader fileReader = new FileReader(name);
             
@@ -339,11 +367,11 @@ public class GoMap {
             
             bufferedReader.close();
         }
-        catch(FileNotFoundException ex) {
+        catch(FileNotFoundException e) {
             logger.warning("Unable to open file with a map! Is it a first lauch?");
         }
-        catch(IOException ex) {
-            logger.warning("Error reading file '" + name + "'");
+        catch(IOException e) {
+            logger.warning("Error reading file '" + name + "' "+ e.getStackTrace());
         }
 	}
 }

@@ -113,6 +113,6 @@ public class GoNode {
 		String easts = east == null ? "" : east.getId();
 		String souths = south == null ? "" : south.getId();
 		String wests = west == null ? "" : west.getId();
-		return ChatColor.YELLOW+"Узел>"+ChatColor.GREEN+" Id: "+id+" X: "+x+ " Y: " + y +" Z: "+z+" North: "+norths+" East: "+easts+" South: "+souths+" West: "+wests;
+		return ChatColor.YELLOW+"Node>"+ChatColor.GREEN+" Id: "+id+" X: "+x+ " Y: " + y +" Z: "+z+" North: "+norths+" East: "+easts+" South: "+souths+" West: "+wests;
 	}
 }

@@ -22,21 +22,20 @@ import org.bukkit.util.Vector;
 import com.radiantai.gox.GoX;
 import com.radiantai.gox.pathfinding.GoPath;
 import com.radiantai.gox.pathfinding.Utils;
+import com.radiantai.gox.structures.RollingQueue;
 
 public class GoXMovement implements Listener {
 	
 	private GoX plugin;
 	private Logger logger;
 	
-	public GoXMovement(GoX plugin) {
+	public GoXMovement(GoX plugin, Logger logger) {
 		this.plugin = plugin;
-		logger = Logger.getLogger("Minecraft");
+		this.logger = logger;
 	}
 	
 	@EventHandler
 	public void onMinecartMove(VehicleMoveEvent e){
-		
-		Logger logger = Logger.getLogger("Minecraft");
 		
 		if(!(e.getVehicle() instanceof Minecart)){
 			return;
@@ -44,12 +43,11 @@ public class GoXMovement implements Listener {
 		
 		Minecart cart = (Minecart)e.getVehicle();
 		
-		if (!isOnRails(cart) || !hasPassenger(cart)) {
+		if (!Utils.isOnRails(cart) || !Utils.hasPlayer(cart)) {
 			return;
 		}
 		
-		Entity passenger = cart.getPassenger();
-		Player player = (Player) passenger;
+		Player player = (Player) cart.getPassenger();
 		
 		Material blockUnder = cart.getLocation().getBlock().getRelative(BlockFace.DOWN).getType();
 		switch(blockUnder){
@@ -61,7 +59,7 @@ public class GoXMovement implements Listener {
 				return;
 			}
 			
-			player.sendMessage(ChatColor.GREEN + "Going "+dirBlock+"!");
+			//player.sendMessage(ChatColor.GREEN + "Going "+dirBlock+"!");
 			
 			turnRail(cart, dirBlock);
 			
@@ -94,10 +92,10 @@ public class GoXMovement implements Listener {
 	private boolean isAngle(Block rail, Rails state) {
 		if (state.isCurve()) {
 			boolean north, east, south, west;
-			north = isRails(rail.getRelative(BlockFace.NORTH));
-			east = isRails(rail.getRelative(BlockFace.EAST));
-			south = isRails(rail.getRelative(BlockFace.SOUTH));
-			west = isRails(rail.getRelative(BlockFace.WEST));
+			north = Utils.isRails(rail.getRelative(BlockFace.NORTH));
+			east = Utils.isRails(rail.getRelative(BlockFace.EAST));
+			south = Utils.isRails(rail.getRelative(BlockFace.SOUTH));
+			west = Utils.isRails(rail.getRelative(BlockFace.WEST));
 			if (north && east && !west && !south) return true;
 			if (north && west && !east && !south) return true;
 			if (south && east && !west && !north) return true;
@@ -109,29 +107,8 @@ public class GoXMovement implements Listener {
 	private void setMinecartDirection(Minecart cart, String dir) {
 		Vector velocity = cart.getVelocity();
 		double speed = velocity.length();
-		Logger.getLogger("Minecraft").info(dir);
 		Vector newDirection = Utils.getVector(dir).multiply(speed);
 		cart.setVelocity(newDirection);
-	}
-	
-	private boolean isOnRails(Minecart cart) {
-		Block rail = cart.getLocation().getBlock();
-		return 	isRails(rail);
-	}
-	
-	private boolean isRails(Block rail) {
-		return 	rail.getType() == Material.ACTIVATOR_RAIL
-				|| rail.getType() == Material.DETECTOR_RAIL
-				|| rail.getType() == Material.POWERED_RAIL
-				|| rail.getType() == Material.RAILS;
-	}
-	
-	private boolean hasPassenger(Minecart cart) {
-		Entity passenger = cart.getPassenger();
-		if (passenger == null || !(passenger instanceof Player)) {
-			return false;
-		}
-		return true;
 	}
 	
 	private String getPlayerNextDirection(Player player) {

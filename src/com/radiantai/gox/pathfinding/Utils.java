@@ -2,7 +2,12 @@ package com.radiantai.gox.pathfinding;
 
 import java.util.UUID;
 
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -56,5 +61,33 @@ public class Utils {
 		if (player.hasMetadata("go_path")) {
 			player.removeMetadata("go_path", plugin);
 		}
+	}
+	
+	public static boolean hasPassenger(Minecart cart) {
+		Entity passenger = cart.getPassenger();
+		if (passenger == null || !(passenger instanceof LivingEntity)) {
+			return false;
+		}
+		return true;
+	}
+	
+	public static boolean hasPlayer(Minecart cart) {
+		Entity passenger = cart.getPassenger();
+		if (passenger == null || !(passenger instanceof Player)) {
+			return false;
+		}
+		return true;
+	}
+	
+	public static boolean isOnRails(Minecart cart) {
+		Block rail = cart.getLocation().getBlock();
+		return 	isRails(rail);
+	}
+	
+	public static boolean isRails(Block rail) {
+		return 	rail.getType() == Material.ACTIVATOR_RAIL
+				|| rail.getType() == Material.DETECTOR_RAIL
+				|| rail.getType() == Material.POWERED_RAIL
+				|| rail.getType() == Material.RAILS;
 	}
 }

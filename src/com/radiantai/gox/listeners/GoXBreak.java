@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -18,10 +19,12 @@ import com.radiantai.gox.pathfinding.GoNode;
 public class GoXBreak implements Listener {
 	private GoX plugin;
 	private Logger logger;
+	private ConfigurationSection config;
 	
-	public GoXBreak(GoX plugin) {
+	public GoXBreak(GoX plugin, Logger logger) {
 		this.plugin = plugin;
-		logger = Logger.getLogger("Minecraft");
+		this.logger = logger;
+		this.config = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("commands");
 	}
 	
 	@EventHandler
@@ -33,7 +36,7 @@ public class GoXBreak implements Listener {
 		Location location = block.getLocation();
 		GoNode node = GoMap.GetNode((int) location.getX(), (int) location.getZ());
 		if (node != null && node.getY() == (int) location.getY()) {
-			e.getPlayer().sendMessage(ChatColor.RED+"You cannot break a block registered as a node!");
+			e.getPlayer().sendMessage(ChatColor.RED+config.getString("cannot break"));
 			e.setCancelled(true);
 		}
 	}

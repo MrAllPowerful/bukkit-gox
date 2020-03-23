@@ -3,10 +3,10 @@ package com.radiantai.gox.pathfinding;
 import java.util.LinkedList;
 import java.util.Stack;
 
-public class GoPath {
+public class GoXPath {
 	private Stack<String> path;
 	
-	public GoPath() {
+	public GoXPath() {
 		path = new Stack<String>();
 	}
 	

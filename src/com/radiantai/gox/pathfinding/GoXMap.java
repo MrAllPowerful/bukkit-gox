@@ -26,9 +26,9 @@ import org.bukkit.entity.Player;
 
 import com.radiantai.gox.GoX;
 
-public class GoMap {
-	private static List<GoNode> nodes = new ArrayList<GoNode>();
-	private static Map<String, GoStation> stations = new HashMap<String,GoStation>();
+public class GoXMap {
+	private static List<GoXNode> nodes = new ArrayList<GoXNode>();
+	private static Map<String, GoXStation> stations = new HashMap<String,GoXStation>();
 	private static GoX plugin;
 	private static ConfigurationSection config;
 	private static Logger logger;
@@ -39,40 +39,40 @@ public class GoMap {
 		config = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("other");
 	}
 	
-	public static void AddNode(GoNode node) {
+	public static void AddNode(GoXNode node) {
 		nodes.add(node);
 	}
 	
 	public static void AddNode(int x, int y, int z) throws Exception {
-		GoNode node = GoMap.GetNode(x, z);
+		GoXNode node = GoXMap.GetNode(x, z);
 		if (node != null) {
 			throw new Exception(config.getString("already location"));
 		}
-		nodes.add(new GoNode(x, y, z));
+		nodes.add(new GoXNode(x, y, z));
 	}
 	
-	public static void AddStation(GoStation station) {
+	public static void AddStation(GoXStation station) {
 		if (nodes != null) {
 			nodes.add(station);
 		}
 	}
 	
 	public static void AddStation(String name, int x, int y, int z) throws Exception {
-		GoNode node = GoMap.GetNode(x, z);
+		GoXNode node = GoXMap.GetNode(x, z);
 		if (node != null) {
 			throw new Exception(config.getString("already location"));
 		}
 		if (stations.get(name) != null) {
 			throw new Exception(config.getString("already name"));
 		}
-		GoStation newst = new GoStation(name, x, y, z);
+		GoXStation newst = new GoXStation(name, x, y, z);
 		nodes.add(newst);
 		stations.put(name, newst);
 	}
 	
 	public static void RemoveStation(String name) throws Exception {
 		if (stations != null) {
-			GoStation st = stations.get(name);
+			GoXStation st = stations.get(name);
 			if (st == null) {
 				throw new Exception(config.getString("no such station"));
 			}
@@ -82,8 +82,8 @@ public class GoMap {
 	}
 	
 	public static void RemoveNode(String id) throws Exception {
-		GoNode node = GetNode(id);
-		if (node instanceof GoStation) {
+		GoXNode node = GetNode(id);
+		if (node instanceof GoXStation) {
 			throw new Exception(config.getString("cannot remove node"));
 		}
 		RemoveNodeP(id);
@@ -91,7 +91,7 @@ public class GoMap {
 	
 	private static void RemoveNodeP(String id) throws Exception {
 		if (nodes != null) {
-			GoNode node = GetNode(id);
+			GoXNode node = GetNode(id);
 			if (node.north != null) {
 				node.north.SetSouth(null);
 			}
@@ -110,8 +110,8 @@ public class GoMap {
 		}
 	}
 	
-	public static GoNode GetNode(int x, int z) {
-		List<GoNode> list = nodes.stream()
+	public static GoXNode GetNode(int x, int z) {
+		List<GoXNode> list = nodes.stream()
 		.filter(node -> (node.getX() == x && node.getZ() == z))
 		.collect(Collectors.toList());
 		if (!list.isEmpty()) {
@@ -120,8 +120,8 @@ public class GoMap {
 		return null;
 	}
 	
-	public static GoNode GetNode(String id) {
-		List<GoNode> list = nodes.stream()
+	public static GoXNode GetNode(String id) {
+		List<GoXNode> list = nodes.stream()
 		.filter(node -> (node.getId().equals(id)))
 		.collect(Collectors.toList());
 		if (!list.isEmpty()) {
@@ -130,13 +130,13 @@ public class GoMap {
 		return null;
 	}
 	
-	public static GoStation GetStation(String name) {
-		GoStation st = stations.get(name);
+	public static GoXStation GetStation(String name) {
+		GoXStation st = stations.get(name);
 		return st;
 	}
 	
 	
-	public static void LinkNodes(GoNode from, GoNode to) throws Exception {
+	public static void LinkNodes(GoXNode from, GoXNode to) throws Exception {
 		if (from.getX()==to.getX() && from.getZ()==to.getZ()) {
 			throw new Exception(config.getString("to itself"));
 		}
@@ -168,7 +168,7 @@ public class GoMap {
 	public static void MessageNodes(Player player) {
 		player.sendMessage(ChatColor.AQUA+config.getString("nodes"));
 		if (!nodes.isEmpty()) {
-			for (GoNode node : nodes) {
+			for (GoXNode node : nodes) {
 				player.sendMessage(ChatColor.GREEN + " "+node.toString());
 			}
 		}
@@ -180,7 +180,7 @@ public class GoMap {
 	public static void MessageStations(Player player) {
 		player.sendMessage(ChatColor.AQUA+config.getString("stations"));
 		if (!nodes.isEmpty()) {
-			for (GoStation st : new ArrayList<GoStation>(stations.values())) {
+			for (GoXStation st : new ArrayList<GoXStation>(stations.values())) {
 				player.sendMessage(ChatColor.GREEN + " "+st.toString());
 			}
 		}
@@ -189,14 +189,14 @@ public class GoMap {
 		}
 	}
 	
-	public static GoPath FindPath(String start, String finish) {
-		Queue<GoNode> searchQueue = new LinkedList<GoNode>();
+	public static GoXPath FindPath(String start, String finish) {
+		Queue<GoXNode> searchQueue = new LinkedList<GoXNode>();
 		ArrayList<String> visited = new ArrayList<String>();
-		GoNode first = GetNode(start).clone();
-		GoPath path = new GoPath();
+		GoXNode first = GetNode(start).clone();
+		GoXPath path = new GoXPath();
 		searchQueue.add(first);
 		while (!searchQueue.isEmpty()) {
-			GoNode curr = searchQueue.poll();
+			GoXNode curr = searchQueue.poll();
 			visited.add(curr.id);
 			if (curr.getId().equals(finish)) {
 				while (curr.prev != null) {
@@ -215,6 +215,10 @@ public class GoMap {
 				searchQueue.add(curr.getWest().clone().setPrev(curr).setFromPrev("west"));
 		}
 		return null;
+	}
+	
+	public static Map<String,GoXStation> GetStations() {
+		return stations;
 	}
 	
 	public static void BackupMap(String name) {
@@ -236,10 +240,10 @@ public class GoMap {
 		try {
 		      FileWriter writer = new FileWriter(name);
 		      BufferedWriter nodeWriter = new BufferedWriter(writer);
-		      for (GoNode node : nodes) {
+		      for (GoXNode node : nodes) {
 		    	  nodeWriter.write(node.getId());
 		    	  nodeWriter.newLine();
-		    	  nodeWriter.write(node instanceof GoStation ? ((GoStation) node).GetName() : "null");
+		    	  nodeWriter.write(node instanceof GoXStation ? ((GoXStation) node).GetName() : "null");
 		    	  nodeWriter.newLine();
 		    	  nodeWriter.write(node.getX()+"");
 		    	  nodeWriter.newLine();
@@ -272,8 +276,8 @@ public class GoMap {
             
             String line = null;
             
-            nodes = new ArrayList<GoNode>();
-        	stations = new HashMap<String,GoStation>();
+            nodes = new ArrayList<GoXNode>();
+        	stations = new HashMap<String,GoXStation>();
 
             while((line = bufferedReader.readLine()) != null) {
             	String id = line;
@@ -291,12 +295,12 @@ public class GoMap {
             	bufferedReader.readLine();
             	
             	if (!stationName.equals("null")) {
-            		GoStation newStation = new GoStation(id, x, y, z, null, null, null, null, stationName);
+            		GoXStation newStation = new GoXStation(id, x, y, z, null, null, null, null, stationName);
             		stations.put(stationName, newStation);
             		nodes.add(newStation);
             	}
             	else {
-            		GoNode newNode = new GoNode(id, x, y, z, null, null, null, null);
+            		GoXNode newNode = new GoXNode(id, x, y, z, null, null, null, null);
             		nodes.add(newNode);
             	}
             }   
@@ -327,39 +331,39 @@ public class GoMap {
             	String southId = line;
             	line = bufferedReader.readLine();
             	String westId = line;
-            	GoNode target = GetNode(id);
+            	GoXNode target = GetNode(id);
             	if (!northId.equals("null")) {
-            		GoNode north = GetNode(northId);
+            		GoXNode north = GetNode(northId);
             		target.SetNorth(north);
             	}
             	if (!eastId.equals("null")) {
-            		GoNode east = GetNode(eastId);
+            		GoXNode east = GetNode(eastId);
             		target.SetEast(east);
             	}
             	if (!southId.equals("null")) {
-            		GoNode south = GetNode(southId);
+            		GoXNode south = GetNode(southId);
             		target.SetSouth(south);
             	}
             	if (!westId.equals("null")) {
-            		GoNode west = GetNode(westId);
+            		GoXNode west = GetNode(westId);
             		target.SetWest(west);
             	}
             	if (!stationName.equals("null")) {
-            		GoStation targetStation = stations.get(stationName);
+            		GoXStation targetStation = stations.get(stationName);
             		if (!northId.equals("null")) {
-                		GoNode north = GetNode(northId);
+                		GoXNode north = GetNode(northId);
                 		targetStation.SetNorth(north);
                 	}
                 	if (!eastId.equals("null")) {
-                		GoNode east = GetNode(eastId);
+                		GoXNode east = GetNode(eastId);
                 		targetStation.SetEast(east);
                 	}
                 	if (!southId.equals("null")) {
-                		GoNode south = GetNode(southId);
+                		GoXNode south = GetNode(southId);
                 		targetStation.SetSouth(south);
                 	}
                 	if (!westId.equals("null")) {
-                		GoNode west = GetNode(westId);
+                		GoXNode west = GetNode(westId);
                 		targetStation.SetWest(west);
                 	}
             	}

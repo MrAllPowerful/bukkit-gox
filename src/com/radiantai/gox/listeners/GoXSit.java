@@ -16,10 +16,11 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
-import com.radiantai.gox.pathfinding.GoMap;
-import com.radiantai.gox.pathfinding.GoNode;
-import com.radiantai.gox.pathfinding.GoPath;
-import com.radiantai.gox.pathfinding.Utils;
+import com.radiantai.gox.pathfinding.GoXMap;
+import com.radiantai.gox.pathfinding.GoXNode;
+import com.radiantai.gox.pathfinding.GoXPath;
+import com.radiantai.gox.pathfinding.GoXUtils;
+import com.radiantai.gox.structures.GoXPlayer;
 
 public class GoXSit implements Listener {
 	private GoX plugin;
@@ -40,44 +41,45 @@ public class GoXSit implements Listener {
 		if (!(e.getEntered() instanceof Player)) {
 			return;
 		}
-		Block block = e.getVehicle().getLocation().getBlock();
-		if (block.getType() != Material.RAILS) {
+		
+		Minecart cart = (Minecart) e.getVehicle();
+		Player player = (Player) e.getEntered();
+		
+		Block block = cart.getLocation().getBlock();
+		if (!GoXUtils.isRails(block)) {
 			return;
 		}
-		if (block.getRelative(BlockFace.DOWN).getType() != Material.NETHERRACK &&
-				block.getRelative(BlockFace.DOWN).getType() != Material.BRICK) {
+		if (!GoXUtils.isCartOverBlock(cart, Material.NETHERRACK) &&
+				!GoXUtils.isCartOverBlock(cart, Material.NETHERRACK)) {
 			return;
 		}
-		GoNode node = GoMap.GetNode((int) block.getX(), (int) block.getZ());
+		GoXNode node = GoXMap.GetNode((int) block.getX(), (int) block.getZ());
 		if (node == null) {
 			return;
 		}
-		Minecart cart = (Minecart) e.getVehicle();
-		Player player = (Player) e.getEntered();
-		if (player.hasMetadata("go_destination")) {
-			String finish = player.getMetadata("go_destination").get(0).asString();
-			if (finish != null) {
-				player.sendMessage(ChatColor.YELLOW+config.getString("searching path"));
-				GoPath path = GoMap.FindPath(node.getId(), finish);
-				if (path == null || path.IsEmpty()) {
-					player.sendMessage(ChatColor.RED+config.getString("path not found"));
-					Utils.resetPathMeta(player, plugin);
-					return;
-				}
-				Utils.resetPathMeta(player, plugin);
-				String startDirection = path.Peek();
-				player.setMetadata("go_next", new FixedMetadataValue(plugin, path.Pop()));
-				player.setMetadata("go_path", new FixedMetadataValue(plugin, path));
-				player.sendMessage(ChatColor.GREEN+config.getString("path found"));
-				cart.setMaxSpeed(cart.getMaxSpeed()*1.3);
-				Vector v = Utils.getVector(startDirection).multiply(cart.getMaxSpeed()*0.5);
-				cart.setVelocity(v);
+		
+		GoXPlayer p = new GoXPlayer(player, plugin);
+		
+		String destination = p.getDestination();
+		
+		if (destination != null) {
+			player.sendMessage(ChatColor.YELLOW+config.getString("searching path"));
+			GoXPath path = GoXMap.FindPath(node.getId(), destination);
+			p.setPath(path);
+			if (path == null || path.IsEmpty()) {
+				p.resetPath();
+				player.sendMessage(ChatColor.RED+config.getString("path not found"));
+				return;
 			}
-			else {
-				player.sendMessage(ChatColor.RED+config.getString("no destination"));
-			}
+			String startDirection = p.popPath();
+			p.setNext(startDirection);
+			p.setPath(path);
+			player.sendMessage(ChatColor.GREEN+config.getString("path found"));
+			Vector v = GoXUtils.getVector(startDirection).multiply(cart.getMaxSpeed()*0.7);
+			cart.setVelocity(v);
 		}
 		else {
+			p.resetPath();
 			player.sendMessage(ChatColor.RED+config.getString("no destination"));
 		}
 	}

@@ -4,27 +4,27 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 
-public class GoNode {
+public class GoXNode {
 	protected String id;
 	protected int x;
 	protected int y;
 	protected int z;
-	protected GoNode north;
-	protected GoNode east;
-	protected GoNode south;
-	protected GoNode west;
+	protected GoXNode north;
+	protected GoXNode east;
+	protected GoXNode south;
+	protected GoXNode west;
 	protected boolean visited;
-	protected GoNode prev;
+	protected GoXNode prev;
 	protected String fromPrev;
 	
-	public GoNode(int x, int y, int z) {
-		id = Utils.GenerateId(8);
+	public GoXNode(int x, int y, int z) {
+		id = GoXUtils.GenerateId(16);
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 	
-	public GoNode(String id, int x, int y, int z, GoNode north, GoNode east, GoNode south, GoNode west) {
+	public GoXNode(String id, int x, int y, int z, GoXNode north, GoXNode east, GoXNode south, GoXNode west) {
 		this.id = id;
 		this.x = x;
 		this.y = y;
@@ -38,8 +38,8 @@ public class GoNode {
 		this.fromPrev = null;
 	}
 
-	protected GoNode clone() {
-		return new GoNode(id, x, y, z, north, east, south, west);
+	protected GoXNode clone() {
+		return new GoXNode(id, x, y, z, north, east, south, west);
 	}
 
 	public String getId(){
@@ -58,35 +58,35 @@ public class GoNode {
 		return y;
 	}
 
-	public GoNode getNorth(){
+	public GoXNode getNorth(){
 		return north;
 	}
 	
-	public GoNode getEast(){
+	public GoXNode getEast(){
 		return east;
 	}
 	
-	public GoNode getSouth(){
+	public GoXNode getSouth(){
 		return south;
 	}
 	
-	public GoNode getWest(){
+	public GoXNode getWest(){
 		return west;
 	}
 	
-	public void SetNorth(GoNode north) {
+	public void SetNorth(GoXNode north) {
 		this.north = north;
 	}
 
-	public void SetEast(GoNode east) {
+	public void SetEast(GoXNode east) {
 		this.east = east;
 	}
 
-	public void SetSouth(GoNode south) {
+	public void SetSouth(GoXNode south) {
 		this.south = south;
 	}
 
-	public void SetWest(GoNode west) {
+	public void SetWest(GoXNode west) {
 		this.west = west;
 	}
 
@@ -94,16 +94,16 @@ public class GoNode {
 		return fromPrev;
 	}
 
-	public GoNode setFromPrev(String fromPrev) {
+	public GoXNode setFromPrev(String fromPrev) {
 		this.fromPrev = fromPrev;
 		return this;
 	}
 	
-	public GoNode getPrev() {
+	public GoXNode getPrev() {
 		return prev;
 	}
 
-	public GoNode setPrev(GoNode prev) {
+	public GoXNode setPrev(GoXNode prev) {
 		this.prev = prev;
 		return this;
 	}

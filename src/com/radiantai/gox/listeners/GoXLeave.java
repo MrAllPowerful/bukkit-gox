@@ -9,7 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 
 import com.radiantai.gox.GoX;
-import com.radiantai.gox.pathfinding.Utils;
+import com.radiantai.gox.pathfinding.GoXUtils;
+import com.radiantai.gox.structures.GoXPlayer;
 
 public class GoXLeave implements Listener {
 	
@@ -29,7 +30,7 @@ public class GoXLeave implements Listener {
 		
 		Minecart cart = (Minecart)e.getVehicle();
 		
-		if (!Utils.hasPassenger(cart)) {
+		if (!GoXUtils.hasPassenger(cart)) {
 			return;
 		}
 		
@@ -39,7 +40,7 @@ public class GoXLeave implements Listener {
 		
 		Player player = (Player) e.getExited();
 		
-		Utils.resetPathMeta(player, plugin);
+		new GoXPlayer(player, plugin).resetPath();
 		
 	}
 }

@@ -5,8 +5,10 @@ import java.util.logging.Logger;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import com.radiantai.gox.commands.GoM;
+import com.radiantai.gox.chat.GoXChat;
 import com.radiantai.gox.collisioncanceling.GoXCancelOnMove;
 import com.radiantai.gox.collisioncanceling.GoXCollision;
 import com.radiantai.gox.commands.Go;
@@ -16,12 +18,14 @@ import com.radiantai.gox.listeners.GoXBreak;
 import com.radiantai.gox.listeners.GoXLeave;
 import com.radiantai.gox.listeners.GoXMovement;
 import com.radiantai.gox.listeners.GoXSit;
-import com.radiantai.gox.pathfinding.GoMap;
+import com.radiantai.gox.pathfinding.GoXMap;
+import com.radiantai.gox.schedule.GoXMapBackup;
 
 public class GoX extends JavaPlugin {
 	
 	private PluginDescriptionFile pdf;
 	private Logger bukkitLogger;
+	private String mapFileName;
 	
 	public void onEnable() {
 		pdf = getDescription();
@@ -31,8 +35,14 @@ public class GoX extends JavaPlugin {
 		registerEvents();
 		registerCommands();
 		
-		GoMap.SetupPlugin(this, bukkitLogger);
-		GoMap.FromFile("plugins\\"+this.getName()+"\\nodes.txt");
+		mapFileName = "plugins\\"+this.getName()+"\\nodes.txt";
+		
+		GoXMap.SetupPlugin(this, bukkitLogger);
+		GoXMap.FromFile(mapFileName);
+		GoXChat.setupChat(this);
+		
+		BukkitScheduler scheduler = getServer().getScheduler();
+        scheduler.runTaskTimerAsynchronously(this, new GoXMapBackup(this, bukkitLogger, mapFileName), 1200L, 72000L);
 	}
 	
 	private void registerCommands() {
@@ -48,14 +58,14 @@ public class GoX extends JavaPlugin {
 		pm.registerEvents(new GoXAddStation(this, bukkitLogger), this);
 		pm.registerEvents(new GoXBreak(this, bukkitLogger), this);
 		pm.registerEvents(new GoXSit(this, bukkitLogger), this);
-		pm.registerEvents(new GoXCollision(this, bukkitLogger), this);
-		pm.registerEvents(new GoXCancelOnMove(this, bukkitLogger), this);
+		//pm.registerEvents(new GoXCollision(this, bukkitLogger), this);
+		//pm.registerEvents(new GoXCancelOnMove(this, bukkitLogger), this);
 		pm.registerEvents(new GoXLeave(this, bukkitLogger), this);
 	}
 
 	public void onDisable() {
-		GoMap.BackupMap("plugins\\"+this.getName()+"\\nodes.txt");
-		GoMap.ToFile("plugins\\"+this.getName()+"\\nodes.txt");
+		GoXMap.BackupMap(mapFileName);
+		GoXMap.ToFile(mapFileName);
 	}
 	
 	public void loadConfig() {

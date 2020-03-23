@@ -13,10 +13,12 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import com.radiantai.gox.GoX;
-import com.radiantai.gox.pathfinding.GoMap;
-import com.radiantai.gox.pathfinding.GoNode;
-import com.radiantai.gox.pathfinding.GoStation;
-import com.radiantai.gox.pathfinding.Utils;
+import com.radiantai.gox.chat.GoXChat;
+import com.radiantai.gox.pathfinding.GoXMap;
+import com.radiantai.gox.pathfinding.GoXNode;
+import com.radiantai.gox.pathfinding.GoXStation;
+import com.radiantai.gox.pathfinding.GoXUtils;
+import com.radiantai.gox.structures.GoXPlayer;
 
 public class Go implements CommandExecutor {
 	
@@ -64,6 +66,12 @@ public class Go implements CommandExecutor {
 			case "current":
 				executeCurrent(player, args);
 				break;
+			case "info":
+				executeInfo(player, args);
+				break;
+			case "list":
+				executeList(player, args);
+				break;
 			default:
 				executeGo(player, args);
 				break;
@@ -74,28 +82,69 @@ public class Go implements CommandExecutor {
 		}
 	}
 	
+	private void executeList(Player player, String[] args) {
+		int page = 1;
+		if (args.length > 1) {
+			try {
+				page = Integer.parseInt(args[1]);
+			}
+			catch (NumberFormatException e) {
+				player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/go list <page number>");
+				return;
+			}
+		}
+		if (page <= 0) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/go list <page number>");
+			return;
+		}
+		GoXChat.stationList(player, page, 5);
+		
+	}
+
+	private void executeInfo(Player player, String[] args) {
+		if (args.length < 2) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/go info <station name>");
+			return;
+		}
+		String name = args[1];
+		GoXStation st = GoXMap.GetStation(name);
+		if (st != null) {
+			GoXChat.fancyStation(player, st);
+		}
+		else {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("no such station"));
+		}
+		
+	}
+
 	private void executeGo(Player player, String[] args) {
-		GoStation st = GoMap.GetStation(args[0]);
+		GoXStation st = GoXMap.GetStation(args[0]);
 		if (st == null) {
 			player.sendMessage(ChatColor.RED + chatConfig.getString("no station"));
 			return;
 		}
 		String id = st.getId();
-		Utils.resetPathMeta(player, plugin);
-		player.setMetadata("go_destination", new FixedMetadataValue(plugin, id));
+		GoXPlayer p = new GoXPlayer(player, plugin);
+		p.resetPath();
+		p.setDestination(id);
 		player.sendMessage(ChatColor.GREEN + chatConfig.getString("sit"));
 	}
 	
 	private void executeCancel(Player player, String[] args) {
-		Utils.resetPathMeta(player, plugin);
-		player.sendMessage(ChatColor.GREEN + chatConfig.getString("canceled"));
+		GoXPlayer p = new GoXPlayer(player, plugin);
+		p.reset();
+		player.sendMessage(ChatColor.GREEN + GoXChat.chat("canceled"));
 	}
 	
 	private void executeCurrent(Player player, String[] args) {
-		if (player.hasMetadata("go_destination")) {
-			String id = player.getMetadata("go_destination").get(0).asString();
-			GoNode destination = GoMap.GetNode(id);
+		GoXPlayer p = new GoXPlayer(player, plugin);
+		String id = p.getDestination();
+		if (id != null) {
+			GoXNode destination = GoXMap.GetNode(id);
 			player.sendMessage(ChatColor.GREEN + chatConfig.getString("destination")+destination);
+		}
+		else {
+			player.sendMessage(ChatColor.RED + chatConfig.getString("no destination"));
 		}
 	}
 

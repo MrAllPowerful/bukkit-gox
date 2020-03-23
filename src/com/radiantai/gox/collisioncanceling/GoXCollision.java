@@ -19,7 +19,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
-import com.radiantai.gox.pathfinding.Utils;
+import com.radiantai.gox.pathfinding.GoXUtils;
 import com.radiantai.gox.structures.RollingQueue;
 
 public class GoXCollision implements Listener {
@@ -40,14 +40,12 @@ public class GoXCollision implements Listener {
 		
 		Minecart cart = (Minecart)e.getVehicle();
 		
-		if (!Utils.hasPlayer(cart)) {
+		if (!GoXUtils.hasPlayer(cart)) {
 			return;
 		}
 		
-		Player player = (Player) cart.getPassenger();
-		
-		player.setMetadata("gox_col", new FixedMetadataValue(plugin, true));
-		
+//		Player player = (Player) cart.getPassenger();
+//		
 //		e.setCancelled(true);
 //		e.setCollisionCancelled(true);
 //		e.setPickupCancelled(true);

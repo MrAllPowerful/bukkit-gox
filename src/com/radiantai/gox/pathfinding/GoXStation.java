@@ -2,15 +2,15 @@ package com.radiantai.gox.pathfinding;
 
 import org.bukkit.ChatColor;
 
-public class GoStation extends GoNode {
+public class GoXStation extends GoXNode {
 	private String name;
 	
-	public GoStation(String name, int x, int y, int z) {
+	public GoXStation(String name, int x, int y, int z) {
 		super(x, y, z);
 		this.name = name;
 	}
 	
-	public GoStation(String id, int x, int y, int z, GoNode north, GoNode east, GoNode south, GoNode west, String name) {
+	public GoXStation(String id, int x, int y, int z, GoXNode north, GoXNode east, GoXNode south, GoXNode west, String name) {
 		super(id, x, y, z, north, east, south, west);
 		this.name = name;
 	}

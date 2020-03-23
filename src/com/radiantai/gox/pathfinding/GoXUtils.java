@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
 
-public class Utils {
+public class GoXUtils {
 	
 	public static String GenerateId(int length) {
 		String uuid = UUID.randomUUID().toString().substring(0, length-1);
@@ -54,13 +54,8 @@ public class Utils {
 		return dir.equals("north")  || dir.equals("east") || dir.equals("south") || dir.equals("west");
 	}
 	
-	public static void resetPathMeta(Player player, GoX plugin) {
-		if (player.hasMetadata("go_destination")) {
-			player.removeMetadata("go_destination", plugin);
-		}
-		if (player.hasMetadata("go_path")) {
-			player.removeMetadata("go_path", plugin);
-		}
+	public static boolean isCartOverBlock(Minecart cart, Material material) {
+		return cart.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == material;
 	}
 	
 	public static boolean hasPassenger(Minecart cart) {
@@ -89,5 +84,9 @@ public class Utils {
 				|| rail.getType() == Material.DETECTOR_RAIL
 				|| rail.getType() == Material.POWERED_RAIL
 				|| rail.getType() == Material.RAILS;
+	}
+	
+	public static void stopCart(Minecart cart) {
+		cart.setVelocity(new Vector(0,0,0));
 	}
 }

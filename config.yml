@@ -1,4 +1,5 @@
 lang:
+   cyrillic decoding: true
    commands:
       no access: "You don't have permission to use this command!"
       usage: "Usage: "
@@ -32,9 +33,11 @@ lang:
       station: "Station"
       node: "Node"
       id: "Id"
+      location: "Location:"
       x: "X"
       y: "Y"
       z: "Z"
+      connection: "Connection:"
       north: "North"
       east: "East"
       south: "South"
@@ -42,7 +45,7 @@ lang:
       name: "Name"
       no such command: "There is no such command for: "
       name reserved: "You cannot use this name!"
-   other:
+      arrived: "You arrived at: "
       already location: "There is already a node/station at that location!"
       already name: "There is already a station with the same name!"
       no such station: "There is no such station!"
@@ -53,9 +56,12 @@ lang:
       empty: "empty"
       nodes: "Nodes:"
       stations: "Stations:"
+      list: "List"
 config:
    prohibited stations:
       - "cancel"
       - "current"
       - "closest"
+      - "info"
+      - "list"
       

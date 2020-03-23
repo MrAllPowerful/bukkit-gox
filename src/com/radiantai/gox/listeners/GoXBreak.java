@@ -13,8 +13,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import com.radiantai.gox.GoX;
-import com.radiantai.gox.pathfinding.GoMap;
-import com.radiantai.gox.pathfinding.GoNode;
+import com.radiantai.gox.pathfinding.GoXMap;
+import com.radiantai.gox.pathfinding.GoXNode;
 
 public class GoXBreak implements Listener {
 	private GoX plugin;
@@ -34,7 +34,7 @@ public class GoXBreak implements Listener {
 			return;
 		}
 		Location location = block.getLocation();
-		GoNode node = GoMap.GetNode((int) location.getX(), (int) location.getZ());
+		GoXNode node = GoXMap.GetNode((int) location.getX(), (int) location.getZ());
 		if (node != null && node.getY() == (int) location.getY()) {
 			e.getPlayer().sendMessage(ChatColor.RED+config.getString("cannot break"));
 			e.setCancelled(true);

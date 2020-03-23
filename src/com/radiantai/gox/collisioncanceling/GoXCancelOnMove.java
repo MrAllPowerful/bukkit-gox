@@ -14,7 +14,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
-import com.radiantai.gox.pathfinding.Utils;
+import com.radiantai.gox.pathfinding.GoXUtils;
 import com.radiantai.gox.structures.RollingQueue;
 
 public class GoXCancelOnMove implements Listener {
@@ -36,7 +36,7 @@ public class GoXCancelOnMove implements Listener {
 		
 		Minecart cart = (Minecart)e.getVehicle();
 		
-		if (!Utils.isOnRails(cart) || !Utils.hasPassenger(cart)) {
+		if (!GoXUtils.isOnRails(cart) || !GoXUtils.hasPassenger(cart)) {
 			return;
 		}
 		

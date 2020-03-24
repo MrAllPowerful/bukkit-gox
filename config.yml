@@ -45,7 +45,7 @@ lang:
       name: "Name"
       no such command: "There is no such command for: "
       name reserved: "You cannot use this name!"
-      arrived: "You arrived at: "
+      arrived: "You arrived!"
       already location: "There is already a node/station at that location!"
       already name: "There is already a station with the same name!"
       no such station: "There is no such station!"
@@ -57,6 +57,7 @@ lang:
       nodes: "Nodes:"
       stations: "Stations:"
       list: "List"
+      invalid name: "Station name is invalid! Requirements: length: < 16, characters: letters, numbers, _."
 config:
    prohibited stations:
       - "cancel"
@@ -64,4 +65,6 @@ config:
       - "closest"
       - "info"
       - "list"
+backup:
+   ticks between backups: 36000
       

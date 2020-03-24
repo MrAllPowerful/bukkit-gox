@@ -20,6 +20,22 @@ public class GoXUtils {
 		return uuid;
 	}
 	
+	public static boolean validateName(String name) {
+		if (name == null) {
+			return false;
+		}
+		if (name.isEmpty()) {
+			return false;
+		}
+		if (name.length() > 16) {
+			return false;
+		}
+		if (name.matches("^\\w+$")) {
+			return true;
+		}
+		return false;
+	}
+	
 	public static Vector getVector(String dir) {
 		dir = dir.toLowerCase();
 		switch (dir) {

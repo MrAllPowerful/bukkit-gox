@@ -21,6 +21,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
+import com.radiantai.gox.chat.GoXChat;
 import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.pathfinding.GoXNode;
 import com.radiantai.gox.pathfinding.GoXPath;
@@ -32,12 +33,10 @@ public class GoXMovement implements Listener {
 	
 	private GoX plugin;
 	private Logger logger;
-	private ConfigurationSection chatConfig;
 	
 	public GoXMovement(GoX plugin, Logger logger) {
 		this.plugin = plugin;
 		this.logger = logger;
-		this.chatConfig = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("commands");
 	}
 	
 	@EventHandler
@@ -65,9 +64,8 @@ public class GoXMovement implements Listener {
 		
 		if (destination != null) {
 			if (node != null && node.getId().equals(destination)) {
-				//logger.info("Arrived!");
 				gp.reset();
-				player.sendMessage(ChatColor.GREEN+chatConfig.getString("arrived")+node);
+				player.sendMessage(ChatColor.GREEN+GoXChat.chat("arrived"));
 				GoXUtils.stopCart(cart);
 				return;
 			}

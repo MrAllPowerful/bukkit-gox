@@ -15,16 +15,15 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.radiantai.gox.GoX;
+import com.radiantai.gox.chat.GoXChat;
 
 public class GoXAddStation implements Listener {
 	private GoX plugin;
 	private Logger logger;
-	private ConfigurationSection config;
 	
 	public GoXAddStation(GoX plugin, Logger logger) {
 		this.plugin = plugin;
 		this.logger = logger;
-		this.config = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("commands");
 	}
 	
 	@EventHandler
@@ -38,7 +37,7 @@ public class GoXAddStation implements Listener {
 		if (under.getType() == Material.NETHERRACK) {
 			player.setMetadata("go_add_station", new FixedMetadataValue(plugin, under.getLocation()));
 			player.sendMessage(
-					ChatColor.GREEN + config.getString("enter add station") + ChatColor.WHITE + "/gom addstation <station name>");
+					ChatColor.GREEN + GoXChat.chat("enter add station") + ChatColor.WHITE + "/gom addstation <station name>");
 		}
 	}
 }

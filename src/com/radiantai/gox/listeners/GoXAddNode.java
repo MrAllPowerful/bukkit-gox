@@ -15,16 +15,15 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.radiantai.gox.GoX;
+import com.radiantai.gox.chat.GoXChat;
 
 public class GoXAddNode implements Listener {
 	private GoX plugin;
 	private Logger logger;
-	private ConfigurationSection config;
 	
 	public GoXAddNode(GoX plugin, Logger logger) {
 		this.plugin = plugin;
 		this.logger = logger;
-		this.config = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("commands");
 	}
 	
 	@EventHandler
@@ -37,7 +36,7 @@ public class GoXAddNode implements Listener {
 		Player player = e.getPlayer();
 		if (under.getType() == Material.BRICK) {
 			player.setMetadata("go_add", new FixedMetadataValue(plugin, under.getLocation()));
-			player.sendMessage(ChatColor.GREEN + config.getString("enter add node") + ChatColor.WHITE + "/gom add");
+			player.sendMessage(ChatColor.GREEN + GoXChat.chat("enter add node") + ChatColor.WHITE + "/gom add");
 		}
 	}
 }

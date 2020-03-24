@@ -16,6 +16,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
+import com.radiantai.gox.chat.GoXChat;
 import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.pathfinding.GoXNode;
 import com.radiantai.gox.pathfinding.GoXPath;
@@ -25,12 +26,10 @@ import com.radiantai.gox.structures.GoXPlayer;
 public class GoXSit implements Listener {
 	private GoX plugin;
 	private Logger logger;
-	private ConfigurationSection config;
 	
 	public GoXSit(GoX plugin, Logger logger) {
 		this.plugin = plugin;
 		this.logger = logger;
-		this.config = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("commands");
 	}
 	
 	@EventHandler
@@ -63,24 +62,24 @@ public class GoXSit implements Listener {
 		String destination = p.getDestination();
 		
 		if (destination != null) {
-			player.sendMessage(ChatColor.YELLOW+config.getString("searching path"));
+			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("searching path"));
 			GoXPath path = GoXMap.FindPath(node.getId(), destination);
 			p.setPath(path);
 			if (path == null || path.IsEmpty()) {
 				p.resetPath();
-				player.sendMessage(ChatColor.RED+config.getString("path not found"));
+				player.sendMessage(ChatColor.RED+GoXChat.chat("path not found"));
 				return;
 			}
 			String startDirection = p.popPath();
 			p.setNext(startDirection);
 			p.setPath(path);
-			player.sendMessage(ChatColor.GREEN+config.getString("path found"));
+			player.sendMessage(ChatColor.GREEN+GoXChat.chat("path found"));
 			Vector v = GoXUtils.getVector(startDirection).multiply(cart.getMaxSpeed()*0.7);
 			cart.setVelocity(v);
 		}
 		else {
 			p.resetPath();
-			player.sendMessage(ChatColor.RED+config.getString("no destination"));
+			player.sendMessage(ChatColor.RED+GoXChat.chat("no destination"));
 		}
 	}
 }

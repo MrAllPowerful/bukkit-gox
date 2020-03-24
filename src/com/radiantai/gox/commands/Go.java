@@ -46,11 +46,11 @@ public class Go implements CommandExecutor {
 				executeArgs(player, cmd, cmdLabel, args);
 			}
 			else {
-				sender.sendMessage(ChatColor.RED + chatConfig.getString("usage")+"/go <command> "+chatConfig.getString("or")+" /go station");
+				sender.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/go <command> "+GoXChat.chat("or")+" /go station");
 			}
 		}
 		catch (Exception e) {
-			sender.sendMessage(ChatColor.DARK_RED + chatConfig.getString("fatal error"));
+			sender.sendMessage(ChatColor.DARK_RED + GoXChat.chat("fatal error"));
 			logger.warning(e.getMessage());
 		}
 		return false;
@@ -78,7 +78,7 @@ public class Go implements CommandExecutor {
 			}
 		}
 		else {
-			player.sendMessage(ChatColor.DARK_RED + chatConfig.getString("no access"));
+			player.sendMessage(ChatColor.DARK_RED + GoXChat.chat("no access"));
 		}
 	}
 	
@@ -120,14 +120,14 @@ public class Go implements CommandExecutor {
 	private void executeGo(Player player, String[] args) {
 		GoXStation st = GoXMap.GetStation(args[0]);
 		if (st == null) {
-			player.sendMessage(ChatColor.RED + chatConfig.getString("no station"));
+			player.sendMessage(ChatColor.RED + GoXChat.chat("no station"));
 			return;
 		}
 		String id = st.getId();
 		GoXPlayer p = new GoXPlayer(player, plugin);
 		p.resetPath();
 		p.setDestination(id);
-		player.sendMessage(ChatColor.GREEN + chatConfig.getString("sit"));
+		player.sendMessage(ChatColor.GREEN + GoXChat.chat("sit"));
 	}
 	
 	private void executeCancel(Player player, String[] args) {
@@ -141,10 +141,10 @@ public class Go implements CommandExecutor {
 		String id = p.getDestination();
 		if (id != null) {
 			GoXNode destination = GoXMap.GetNode(id);
-			player.sendMessage(ChatColor.GREEN + chatConfig.getString("destination")+destination);
+			player.sendMessage(ChatColor.GREEN + GoXChat.chat("destination")+destination);
 		}
 		else {
-			player.sendMessage(ChatColor.RED + chatConfig.getString("no destination"));
+			player.sendMessage(ChatColor.RED + GoXChat.chat("no destination"));
 		}
 	}
 

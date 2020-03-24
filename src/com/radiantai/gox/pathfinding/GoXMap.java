@@ -25,6 +25,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.radiantai.gox.GoX;
+import com.radiantai.gox.chat.GoXChat;
 
 public class GoXMap {
 	private static List<GoXNode> nodes = new ArrayList<GoXNode>();
@@ -46,7 +47,7 @@ public class GoXMap {
 	public static void AddNode(int x, int y, int z) throws Exception {
 		GoXNode node = GoXMap.GetNode(x, z);
 		if (node != null) {
-			throw new Exception(config.getString("already location"));
+			throw new Exception(GoXChat.chat("already location"));
 		}
 		nodes.add(new GoXNode(x, y, z));
 	}
@@ -58,23 +59,31 @@ public class GoXMap {
 	}
 	
 	public static void AddStation(String name, int x, int y, int z) throws Exception {
+		String idName = name.toLowerCase();
 		GoXNode node = GoXMap.GetNode(x, z);
 		if (node != null) {
-			throw new Exception(config.getString("already location"));
+			throw new Exception(GoXChat.chat("already location"));
 		}
-		if (stations.get(name) != null) {
-			throw new Exception(config.getString("already name"));
+		if (stations.get(idName) != null) {
+			throw new Exception(GoXChat.chat("already name"));
+		}
+		if (!GoXUtils.validateName(name)) {
+			throw new Exception(GoXChat.chat("invalid name"));
+		}
+		List<String> reserved = config.getStringList("prohibited stations");
+		if (reserved.contains(idName)) {
+			throw new Exception(GoXChat.chat("name reserved"));
 		}
 		GoXStation newst = new GoXStation(name, x, y, z);
 		nodes.add(newst);
-		stations.put(name, newst);
+		stations.put(idName, newst);
 	}
 	
 	public static void RemoveStation(String name) throws Exception {
 		if (stations != null) {
 			GoXStation st = stations.get(name);
 			if (st == null) {
-				throw new Exception(config.getString("no such station"));
+				throw new Exception(GoXChat.chat("no such station"));
 			}
 			RemoveNodeP(st.getId());
 			stations.remove(name);
@@ -84,7 +93,7 @@ public class GoXMap {
 	public static void RemoveNode(String id) throws Exception {
 		GoXNode node = GetNode(id);
 		if (node instanceof GoXStation) {
-			throw new Exception(config.getString("cannot remove node"));
+			throw new Exception(GoXChat.chat("cannot remove node"));
 		}
 		RemoveNodeP(id);
 	}
@@ -105,7 +114,7 @@ public class GoXMap {
 				node.west.SetEast(null);
 			}
 			if (!nodes.removeIf(n -> (n.getId() == id))) {
-				throw new Exception(config.getString("no such node"));
+				throw new Exception(GoXChat.chat("no such node"));
 			}
 		}
 	}
@@ -138,7 +147,7 @@ public class GoXMap {
 	
 	public static void LinkNodes(GoXNode from, GoXNode to) throws Exception {
 		if (from.getX()==to.getX() && from.getZ()==to.getZ()) {
-			throw new Exception(config.getString("to itself"));
+			throw new Exception(GoXChat.chat("to itself"));
 		}
 		if (from.getZ()==to.getZ()) {
 			if (from.getX() > to.getX()) {
@@ -161,31 +170,31 @@ public class GoXMap {
 			}
 		}
 		else {
-			throw new Exception(config.getString("one line"));
+			throw new Exception(GoXChat.chat("one line"));
 		}
 	}
 	
 	public static void MessageNodes(Player player) {
-		player.sendMessage(ChatColor.AQUA+config.getString("nodes"));
+		player.sendMessage(ChatColor.AQUA+GoXChat.chat("nodes"));
 		if (!nodes.isEmpty()) {
 			for (GoXNode node : nodes) {
 				player.sendMessage(ChatColor.GREEN + " "+node.toString());
 			}
 		}
 		else {
-			player.sendMessage(ChatColor.YELLOW+"<"+config.getString("empty")+">");
+			player.sendMessage(ChatColor.YELLOW+"<"+GoXChat.chat("empty")+">");
 		}
 	}
 	
 	public static void MessageStations(Player player) {
-		player.sendMessage(ChatColor.AQUA+config.getString("stations"));
+		player.sendMessage(ChatColor.AQUA+GoXChat.chat("stations"));
 		if (!nodes.isEmpty()) {
 			for (GoXStation st : new ArrayList<GoXStation>(stations.values())) {
 				player.sendMessage(ChatColor.GREEN + " "+st.toString());
 			}
 		}
 		else {
-			player.sendMessage(ChatColor.RED+"<"+config.getString("empty")+">");
+			player.sendMessage(ChatColor.RED+"<"+GoXChat.chat("empty")+">");
 		}
 	}
 	

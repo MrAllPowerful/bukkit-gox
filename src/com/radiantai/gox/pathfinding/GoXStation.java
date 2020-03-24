@@ -28,7 +28,8 @@ public class GoXStation extends GoXNode {
 		String easts = east == null ? "" : east.getId();
 		String souths = south == null ? "" : south.getId();
 		String wests = west == null ? "" : west.getId();
-		return ChatColor.YELLOW+"STATION>"+ChatColor.GREEN+" Name: "+name
-				+" Id: "+id+" X: "+x + " Y: " + y + " Z: "+z+" North: "+norths+" East: "+easts+" South: "+souths+" West: "+wests;
+		return "STATION> Name: "+name
+				+" Id: "+id+" X: "+x + " Y: " + y + " Z: "+z+" North: "
+				+norths+" East: "+easts+" South: "+souths+" West: "+wests;
 	}
 }

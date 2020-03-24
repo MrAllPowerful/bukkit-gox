@@ -230,12 +230,17 @@ public class GoXMap {
 		return stations;
 	}
 	
-	public static void BackupMap(String name) {
+	public static void BackupMap(String path, String name) {
 		try {
+			File source = new File(path+name);
+			if (!source.exists()) {
+				new File(path).mkdirs();
+				logger.warning("An error occurred backing up the map file! There is no original file: "+path+name);
+				return;
+			}
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmSS");
 			
-			File source = new File(name);
-			File dest = new File(name+simpleDateFormat.format(new Date())+".backup");
+			File dest = new File(path+name+simpleDateFormat.format(new Date())+".backup");
 			
 			Files.copy(source.toPath(), dest.toPath(),
 	                StandardCopyOption.REPLACE_EXISTING);
@@ -245,11 +250,19 @@ public class GoXMap {
 		}
 	}
 	
-	public static void ToFile(String name) {
+	public static void ToFile(String path, String name) {
 		try {
-		      FileWriter writer = new FileWriter(name);
-		      BufferedWriter nodeWriter = new BufferedWriter(writer);
-		      for (GoXNode node : nodes) {
+			File file = new File(path);
+			if (!file.exists()) {
+				file.mkdirs();
+				return;
+			}
+			if (nodes.isEmpty()) {
+				return;
+			}
+			FileWriter writer = new FileWriter(path+name);
+			BufferedWriter nodeWriter = new BufferedWriter(writer);
+			for (GoXNode node : nodes) {
 		    	  nodeWriter.write(node.getId());
 		    	  nodeWriter.newLine();
 		    	  nodeWriter.write(node instanceof GoXStation ? ((GoXStation) node).GetName() : "null");
@@ -268,18 +281,24 @@ public class GoXMap {
 		    	  nodeWriter.newLine();
 		    	  nodeWriter.write(node.getWest()!=null?node.getWest().getId():"null");
 		    	  nodeWriter.newLine();
-		      }
-		      nodeWriter.close();
-		      logger.info("Successfully wrote to the file.");
+			}
+		      	nodeWriter.close();
+		      	logger.info("Successfully wrote to the file.");
 	    }
 		catch (IOException e) {
 	      logger.warning("An error occurred writing out a map to the file! "+ e.getStackTrace());
 	    }
 	}
 	
-	public static void FromFile(String name) {
+	public static void FromFile(String path, String name) {
 		try {
-            FileReader fileReader = new FileReader(name);
+			File file = new File(path+name);
+			if (!file.exists()) {
+				file = new File(path);
+				file.mkdirs();
+				return;
+			}
+            FileReader fileReader = new FileReader(path+name);
             
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             
@@ -316,7 +335,7 @@ public class GoXMap {
             
             bufferedReader.close();
             
-            fileReader = new FileReader(name);
+            fileReader = new FileReader(path+name);
             
             bufferedReader = new BufferedReader(fileReader);
             

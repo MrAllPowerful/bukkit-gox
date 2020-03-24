@@ -25,6 +25,7 @@ public class GoX extends JavaPlugin {
 	
 	private PluginDescriptionFile pdf;
 	private Logger bukkitLogger;
+	private String mapFilePath;
 	private String mapFileName;
 	
 	public void onEnable() {
@@ -35,10 +36,11 @@ public class GoX extends JavaPlugin {
 		registerEvents();
 		registerCommands();
 		
-		mapFileName = "plugins\\"+this.getName()+"\\Map\\nodes.txt";
+		mapFilePath = "plugins\\"+this.getName()+"\\Map\\";
+		mapFileName = "nodes.dat";
 		
 		GoXMap.SetupPlugin(this, bukkitLogger);
-		GoXMap.FromFile(mapFileName);
+		GoXMap.FromFile(mapFilePath, mapFileName);
 		GoXChat.setupChat(this);
 		
 		scheduleBackup();
@@ -63,8 +65,8 @@ public class GoX extends JavaPlugin {
 	}
 
 	public void onDisable() {
-		GoXMap.BackupMap(mapFileName);
-		GoXMap.ToFile(mapFileName);
+		GoXMap.BackupMap(mapFilePath, mapFileName);
+		GoXMap.ToFile(mapFilePath, mapFileName);
 	}
 	
 	public void loadConfig() {
@@ -75,6 +77,6 @@ public class GoX extends JavaPlugin {
 	public void scheduleBackup() {
 		BukkitScheduler scheduler = getServer().getScheduler();
 		long backupWait = getConfig().getConfigurationSection("backup").getLong("ticks between backups");
-        scheduler.runTaskTimerAsynchronously(this, new GoXMapBackup(this, bukkitLogger, mapFileName), 1200L, backupWait);
+        scheduler.runTaskTimerAsynchronously(this, new GoXMapBackup(this, bukkitLogger, mapFilePath, mapFileName), 300L, backupWait);
 	}
 }

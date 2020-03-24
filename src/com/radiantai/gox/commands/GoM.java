@@ -66,7 +66,7 @@ public class GoM implements CommandExecutor {
 	}
 	
 	private void executeArgs(Player player, Command cmd, String cmdLabel, String[] args) {
-		if (player.hasPermission("GoX.Go")) {
+		if (player.hasPermission("GoX.GoM")) {
 			String action = args[0];
 			switch (action) {
 			case "add":
@@ -154,7 +154,7 @@ public class GoM implements CommandExecutor {
 	
 	private void executeRemove(Player player, String[] args) {
 		Location location = player.getLocation();
-		GoXNode node = GoXMap.GetNode((int) location.getX(), (int) location.getZ());
+		GoXNode node = GoXMap.GetNode((int) Math.floor(location.getX()), (int) Math.floor(location.getZ()));
 		if (node != null) {
 			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("removing"));
 			try {
@@ -204,7 +204,7 @@ public class GoM implements CommandExecutor {
 		}
 		
 		Location location = player.getLocation();
-		GoXNode node = GoXMap.GetNode((int) location.getX(), (int) location.getZ());
+		GoXNode node = GoXMap.GetNode((int) Math.floor(location.getX()), (int) Math.floor(location.getZ()));
 		GoXNode to = GoXMap.GetNode(x, z);
 		if (to == null) {
 			player.sendMessage(ChatColor.RED+GoXChat.chat("no such node"));
@@ -227,7 +227,7 @@ public class GoM implements CommandExecutor {
 	
 	private void executeInfo(Player player, String[] args) {
 		Location location = player.getLocation();
-		GoXNode node = GoXMap.GetNode((int) location.getX(), (int) location.getZ());
+		GoXNode node = GoXMap.GetNode((int) Math.floor(location.getX()), (int) Math.floor(location.getZ()));
 		if (node != null) {
 			GoXChat.fancyNodeExtended(player, node);
 		}

@@ -42,7 +42,6 @@ public class GoXUtils {
 	}
 	
 	public static Vector getVector(String dir) {
-		dir = dir.toLowerCase();
 		switch (dir) {
 		case "north":
 			return new Vector(0,0,-1);
@@ -120,7 +119,7 @@ public class GoXUtils {
 		Block rail = cart.getLocation().getBlock();
 		BlockState state = rail.getState();
 		Rails railsState = (Rails) state.getData();
-		if (!isAngle(rail, railsState)) {
+		if (!isAngle(rail, railsState) && dir != null) {
 			railsState.setDirection(GoXUtils.getBlockFace(dir), false);
 			state.setData(railsState);
 			state.update();

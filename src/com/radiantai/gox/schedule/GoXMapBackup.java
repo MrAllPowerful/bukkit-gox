@@ -9,19 +9,21 @@ public class GoXMapBackup implements Runnable {
 	
 	private GoX plugin;
 	private String fileName;
+	private String filePath;
 	private Logger logger;
 
-    public GoXMapBackup(GoX plugin, Logger logger, String fileName) {
+    public GoXMapBackup(GoX plugin, Logger logger, String filePath, String fileName) {
         this.plugin = plugin;
         this.fileName = fileName;
+        this.filePath = filePath;
         this.logger = logger;
     }
 
     @Override
     public void run() {
     	logger.info("Running scheduled map backup...");
-    	GoXMap.BackupMap(fileName);
-		GoXMap.ToFile(fileName);
+    	GoXMap.BackupMap(filePath, fileName);
+		GoXMap.ToFile(filePath, fileName);
 		logger.info("Backup complete!");
     }
 }

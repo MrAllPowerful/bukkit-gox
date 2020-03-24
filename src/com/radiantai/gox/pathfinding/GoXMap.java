@@ -37,7 +37,7 @@ public class GoXMap {
 	public static void SetupPlugin(GoX setPlugin, Logger setLogger) {
 		plugin = setPlugin;
 		logger = setLogger;
-		config = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("other");
+		config = plugin.getConfig().getConfigurationSection("config");
 	}
 	
 	public static void AddNode(GoXNode node) {

@@ -42,57 +42,65 @@ public class GoXMovement implements Listener {
 	@EventHandler
 	public void onMinecartMove(VehicleMoveEvent e){
 		
-		if(!(e.getVehicle() instanceof Minecart)){
+		if (!shouldTrack(e)) {
 			return;
 		}
 		
 		Minecart cart = (Minecart)e.getVehicle();
-		
-		if (!GoXUtils.isOnRails(cart) || !GoXUtils.hasPlayer(cart)) {
-			return;
-		}
-		
 		Player player = (Player) cart.getPassenger();
 		GoXPlayer gp = new GoXPlayer(player, plugin);
 		
-		Location location = cart.getLocation();
-		Block block = location.getBlock().getRelative(BlockFace.DOWN);
-		Location nodeLocation = block.getLocation();
-		Material blockUnderType = block.getType();
-		GoXNode node = GoXMap.GetNode((int) nodeLocation.getX(), (int) nodeLocation.getZ());
-		String destination = gp.getDestination();
+		if (gp.getDestination() == null) {
+			return;
+		}
 		
-		if (destination != null) {
-			if (node != null && node.getId().equals(destination)) {
-				gp.reset();
-				player.sendMessage(ChatColor.GREEN+GoXChat.chat("arrived"));
-				GoXUtils.stopCart(cart);
-				return;
-			}
+		Location location = cart.getLocation();
+		Material blockUnderType = location.getBlock().getRelative(BlockFace.DOWN).getType();
+		GoXNode node = GoXMap.GetNode((int) location.getX(), (int) location.getZ());
+		
+		if (hasArrived(gp)) {
+			gp.reset();
+			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("arrived"));
+			GoXChat.fancyStationCompact(player, node);
+			GoXUtils.stopCart(cart);
+			return;
 		}
 		
 		switch(blockUnderType){
 		case BRICK:
 		case NETHERRACK:
-			//logger.info("Special!");
-			String nextDir = gp.getNext();
 			
-			if (nextDir == null || nextDir.isEmpty()) {
+			if (node == null) {
 				return;
 			}
 			
-			turnRail(cart, nextDir);
+			String nextDir = gp.getNext();
 			
-			setMinecartDirection(cart, nextDir);
+			if(needRepath(gp, node)) {
+				GoXUtils.stopCart(cart);
+				gp.resetPath();
+				
+				String startDirection = GoXUtils.repathRoutine(gp, node);
+				
+				GoXUtils.turnRail(cart, startDirection);
+				GoXUtils.pushCart(cart, startDirection);
+				return;
+			}
+			
+			if (nextDir == null) {
+				return;
+			}
+			
+			GoXUtils.turnRail(cart, nextDir);
+			GoXUtils.setMinecartDirection(cart, nextDir);
 			
 			gp.setNext(null);
+			gp.setExpected(node.getLink(nextDir) != null ? node.getLink(nextDir).getId() : null);
 			
 			break;
 		default:
-			//logger.info("Other!");
 			String dirOther = gp.getNext();
 			if (dirOther == null) {
-				//logger.info("Set next!");
 				gp.setNext(gp.popPath());
 				return;
 			}
@@ -100,36 +108,45 @@ public class GoXMovement implements Listener {
 		}
 	}
 	
-	private void turnRail(Minecart cart, String dir) {
-		Block rail = cart.getLocation().getBlock();
-		BlockState state = rail.getState();
-		Rails railsState = (Rails) state.getData();
-		if (!isAngle(rail, railsState)) {
-			railsState.setDirection(GoXUtils.getBlockFace(dir), false);
-			state.setData(railsState);
-			state.update();
+	private boolean shouldTrack(VehicleMoveEvent e) {
+		if(!(e.getVehicle() instanceof Minecart)){
+			return false;
 		}
+		Minecart cart = (Minecart)e.getVehicle();
+		if (!GoXUtils.isOnRails(cart) || !GoXUtils.hasPlayer(cart)) {
+			return false;
+		}
+		return true;
 	}
 	
-	private boolean isAngle(Block rail, Rails state) {
-		if (state.isCurve()) {
-			boolean north, east, south, west;
-			north = GoXUtils.isRails(rail.getRelative(BlockFace.NORTH));
-			east = GoXUtils.isRails(rail.getRelative(BlockFace.EAST));
-			south = GoXUtils.isRails(rail.getRelative(BlockFace.SOUTH));
-			west = GoXUtils.isRails(rail.getRelative(BlockFace.WEST));
-			if (north && east && !west && !south) return true;
-			if (north && west && !east && !south) return true;
-			if (south && east && !west && !north) return true;
-			if (south && west && !east && !north) return true;
+	private boolean hasArrived(GoXPlayer gp) {
+		
+		Block block = gp.getPlayer().getVehicle().getLocation().getBlock().getRelative(BlockFace.DOWN);
+		Location nodeLocation = block.getLocation();
+		
+		GoXNode node = GoXMap.GetNode((int) nodeLocation.getX(), (int) nodeLocation.getZ());
+		String destination = gp.getDestination();
+		
+		if (destination != null) {
+			if (node != null && node.getId().equals(destination)) {
+				return true;
+			}
 		}
 		return false;
 	}
 	
-	private void setMinecartDirection(Minecart cart, String dir) {
-		Vector velocity = cart.getVelocity();
-		double speed = velocity.length();
-		Vector newDirection = GoXUtils.getVector(dir).multiply(speed);
-		cart.setVelocity(newDirection);
+	private boolean needRepath(GoXPlayer gp, GoXNode currNode) {
+		String expected = gp.getExpected();
+		
+		if (gp.getPath() == null) {
+			return true;
+		}
+		
+		if (!currNode.getId().equals(expected) && gp.getNext() != null) {
+			gp.getPlayer().sendMessage(ChatColor.GRAY+GoXChat.chat("repath"));
+			return true;
+		}
+		
+		return false;
 	}
 }

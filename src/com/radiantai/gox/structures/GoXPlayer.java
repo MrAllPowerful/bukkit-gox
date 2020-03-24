@@ -1,10 +1,16 @@
 package com.radiantai.gox.structures;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
+import com.radiantai.gox.chat.GoXChat;
+import com.radiantai.gox.pathfinding.GoXMap;
+import com.radiantai.gox.pathfinding.GoXNode;
 import com.radiantai.gox.pathfinding.GoXPath;
+import com.radiantai.gox.pathfinding.GoXUtils;
 
 public class GoXPlayer {
 	
@@ -16,6 +22,22 @@ public class GoXPlayer {
 		this.plugin = plugin;
 	}
 	
+	public Player getPlayer() {
+		return player;
+	}
+
+	public void setPlayer(Player player) {
+		this.player = player;
+	}
+
+	public GoX getPlugin() {
+		return plugin;
+	}
+
+	public void setPlugin(GoX plugin) {
+		this.plugin = plugin;
+	}
+
 	public void setNext(String dir) {
 		if (dir==null) {
 			if (player.hasMetadata("go_next")) {
@@ -24,6 +46,17 @@ public class GoXPlayer {
 		}
 		else {
 			player.setMetadata("go_next", new FixedMetadataValue(plugin, dir));
+		}
+	}
+	
+	public void setExpected(String node) {
+		if (node==null) {
+			if (player.hasMetadata("go_exp")) {
+				player.removeMetadata("go_exp", plugin);
+			}
+		}
+		else {
+			player.setMetadata("go_exp", new FixedMetadataValue(plugin, node));
 		}
 	}
 	
@@ -49,23 +82,23 @@ public class GoXPlayer {
 		}
 	}
 	
-	public void setRepath(boolean value) {
-		if (value==false) {
-			if (player.hasMetadata("go_repath")) {
-				player.removeMetadata("go_repath", plugin);
-			}
-		}
-		else {
-			player.setMetadata("go_repath", new FixedMetadataValue(plugin, true));
-		}
-	}
-	
 	public String getNext() {
 		String result = null;
 		if (player.hasMetadata("go_next")) {
 			result = player.getMetadata("go_next").get(0).asString();
 			if (result == null) {
 				player.removeMetadata("go_next", plugin);
+			}
+		}
+		return result;
+	}
+	
+	public String getExpected() {
+		String result = null;
+		if (player.hasMetadata("go_exp")) {
+			result = player.getMetadata("go_exp").get(0).asString();
+			if (result == null) {
+				player.removeMetadata("go_exp", plugin);
 			}
 		}
 		return result;
@@ -84,13 +117,10 @@ public class GoXPlayer {
 	
 	public GoXPath getPath() {
 		GoXPath result = null;
-		if (player.hasMetadata("go_destination")) {
-			result = (GoXPath) player.getMetadata("go_destination").get(0).value();
+		if (player.hasMetadata("go_path")) {
+			result = (GoXPath) player.getMetadata("go_path").get(0).value();
 			if (result == null) {
-				player.removeMetadata("go_destination", plugin);
-			}
-			else if (result.IsEmpty()) {
-				player.removeMetadata("go_destination", plugin);
+				player.removeMetadata("go_path", plugin);
 			}
 		}
 		return result;
@@ -105,9 +135,6 @@ public class GoXPlayer {
 			}
 			else {
 				result = path.Pop();
-				if (path.IsEmpty()) {
-					player.removeMetadata("go_path", plugin);
-				}
 			}
 		}
 		return result;
@@ -117,7 +144,7 @@ public class GoXPlayer {
 		String result = null;
 		if (player.hasMetadata("go_path")) {
 			GoXPath path = (GoXPath) player.getMetadata("go_path").get(0).value();
-			if (path == null || path.IsEmpty()) {
+			if (path == null) {
 				player.removeMetadata("go_path", plugin);
 			}
 			else {
@@ -127,24 +154,16 @@ public class GoXPlayer {
 		return result;
 	}
 	
-	public boolean getRepath() {
-		boolean result = false;
-		if (player.hasMetadata("go_repath")) {
-			result = true;
-		}
-		return result;
-	}
-	
 	public void reset() {
 		setNext(null);
 		setDestination(null);
 		setPath(null);
-		setRepath(false);
+		setExpected(null);
 	}
 	
 	public void resetPath() {
 		setNext(null);
 		setPath(null);
-		setRepath(false);
+		setExpected(null);
 	}
 }

@@ -46,7 +46,7 @@ public class Go implements CommandExecutor {
 				executeArgs(player, cmd, cmdLabel, args);
 			}
 			else {
-				sender.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/go <command> "+GoXChat.chat("or")+" /go station");
+				sender.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/go <command> "+GoXChat.chat("or")+" /go <station>");
 			}
 		}
 		catch (Exception e) {
@@ -141,7 +141,8 @@ public class Go implements CommandExecutor {
 		String id = p.getDestination();
 		if (id != null) {
 			GoXNode destination = GoXMap.GetNode(id);
-			player.sendMessage(ChatColor.GREEN + GoXChat.chat("destination")+destination);
+			player.sendMessage(ChatColor.GREEN + GoXChat.chat("destination"));
+			GoXChat.fancyStationCompact(player, destination);
 		}
 		else {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("no destination"));

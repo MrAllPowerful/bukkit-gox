@@ -31,12 +31,12 @@ public class GoXChat {
 		return result;
 	}
 	
-	public static void fancyStationCompact(Player p, GoXStation station) {
-		if (station == null) {
+	public static void fancyStationCompact(Player p, GoXNode station) {
+		if (station == null || !(station instanceof GoXStation)) {
 			p.sendMessage(ChatColor.YELLOW+"<"+chat("empty")+">");
 			return;
 		}
-		p.sendMessage(ChatColor.GREEN+" "+station.GetName());
+		p.sendMessage(ChatColor.GREEN+" "+((GoXStation) station).GetName());
 	}
 	
 	public static void fancyStation(Player p, GoXStation station) {

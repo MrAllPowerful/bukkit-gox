@@ -34,6 +34,7 @@ public class GoXSit implements Listener {
 	
 	@EventHandler
 	public void onCartSit(VehicleEnterEvent e){
+		
 		if (!(e.getVehicle() instanceof Minecart)) {
 			return;
 		}
@@ -44,42 +45,31 @@ public class GoXSit implements Listener {
 		Minecart cart = (Minecart) e.getVehicle();
 		Player player = (Player) e.getEntered();
 		
+		GoXPlayer gp = new GoXPlayer(player, plugin);
+		String destination = gp.getDestination();
+		
+		if (destination == null) {
+			return;
+		}
+		
 		Block block = cart.getLocation().getBlock();
 		if (!GoXUtils.isRails(block)) {
 			return;
 		}
 		if (!GoXUtils.isCartOverBlock(cart, Material.NETHERRACK) &&
-				!GoXUtils.isCartOverBlock(cart, Material.NETHERRACK)) {
+				!GoXUtils.isCartOverBlock(cart, Material.BRICK)) {
 			return;
 		}
+		
 		GoXNode node = GoXMap.GetNode((int) block.getX(), (int) block.getZ());
 		if (node == null) {
 			return;
 		}
 		
-		GoXPlayer p = new GoXPlayer(player, plugin);
+		String startDirection = GoXUtils.repathRoutine(gp, node);
 		
-		String destination = p.getDestination();
+		GoXUtils.turnRail(cart, startDirection);
+		GoXUtils.pushCart(cart, startDirection);
 		
-		if (destination != null) {
-			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("searching path"));
-			GoXPath path = GoXMap.FindPath(node.getId(), destination);
-			p.setPath(path);
-			if (path == null || path.IsEmpty()) {
-				p.resetPath();
-				player.sendMessage(ChatColor.RED+GoXChat.chat("path not found"));
-				return;
-			}
-			String startDirection = p.popPath();
-			p.setNext(startDirection);
-			p.setPath(path);
-			player.sendMessage(ChatColor.GREEN+GoXChat.chat("path found"));
-			Vector v = GoXUtils.getVector(startDirection).multiply(cart.getMaxSpeed()*0.7);
-			cart.setVelocity(v);
-		}
-		else {
-			p.resetPath();
-			player.sendMessage(ChatColor.RED+GoXChat.chat("no destination"));
-		}
 	}
 }

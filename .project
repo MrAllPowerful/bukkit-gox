@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>config.ru.yml</name>
+			<type>1</type>
+			<location>D:/BukkitDev/SubwayX/config.ru.yml</location>
+		</link>
+	</linkedResources>
 </projectDescription>

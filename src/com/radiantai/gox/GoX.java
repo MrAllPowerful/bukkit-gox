@@ -41,9 +41,7 @@ public class GoX extends JavaPlugin {
 		GoXMap.FromFile(mapFileName);
 		GoXChat.setupChat(this);
 		
-		BukkitScheduler scheduler = getServer().getScheduler();
-		long backupWait = getConfig().getConfigurationSection("backup").getLong("ticks between backups");
-        scheduler.runTaskTimerAsynchronously(this, new GoXMapBackup(this, bukkitLogger, mapFileName), 1200L, backupWait);
+		scheduleBackup();
 	}
 	
 	private void registerCommands() {
@@ -72,5 +70,11 @@ public class GoX extends JavaPlugin {
 	public void loadConfig() {
 		getConfig().options().copyDefaults(true);
 		saveConfig();
+	}
+	
+	public void scheduleBackup() {
+		BukkitScheduler scheduler = getServer().getScheduler();
+		long backupWait = getConfig().getConfigurationSection("backup").getLong("ticks between backups");
+        scheduler.runTaskTimerAsynchronously(this, new GoXMapBackup(this, bukkitLogger, mapFileName), 1200L, backupWait);
 	}
 }

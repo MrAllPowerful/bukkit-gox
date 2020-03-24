@@ -107,6 +107,20 @@ public class GoXNode {
 		this.prev = prev;
 		return this;
 	}
+	
+	public GoXNode getLink(String dir) {
+		switch (dir) {
+			case "north":
+				return north;
+			case "east":
+				return east;
+			case "south":
+				return south;
+			case "west":
+				return west;
+		}
+		return null;
+	}
 
 	public String toString() {
 		String norths = north == null ? "" : north.getId();

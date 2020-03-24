@@ -5,7 +5,7 @@ lang:
       usage: "Usage: "
       fatal error: "Error occured executing command!"
       no station: "There is no such station or command."
-      sit: "Sit in a cart on a station block, please."
+      sit: "Sit in a cart on a station and run over a control block."
       canceled: "Canceled!"
       destination: "Current destination: "
       invalid direction: "Invalid direction: "
@@ -58,6 +58,7 @@ lang:
       stations: "Stations:"
       list: "List"
       invalid name: "Station name is invalid! Requirements: length: < 16, characters: letters, numbers, _."
+      repath: "Oops! Did you miss a turn? Let us fix it..."
 config:
    prohibited stations:
       - "cancel"

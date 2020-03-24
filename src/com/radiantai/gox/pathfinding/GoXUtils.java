@@ -2,16 +2,21 @@ package com.radiantai.gox.pathfinding;
 
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.material.Rails;
 import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
+import com.radiantai.gox.chat.GoXChat;
+import com.radiantai.gox.structures.GoXPlayer;
 
 public class GoXUtils {
 	
@@ -104,5 +109,63 @@ public class GoXUtils {
 	
 	public static void stopCart(Minecart cart) {
 		cart.setVelocity(new Vector(0,0,0));
+	}
+	
+	public static void pushCart(Minecart cart, String dir) {
+		Vector v = GoXUtils.getVector(dir).multiply(cart.getMaxSpeed()*0.7);
+		cart.setVelocity(v);
+	}
+	
+	public static void turnRail(Minecart cart, String dir) {
+		Block rail = cart.getLocation().getBlock();
+		BlockState state = rail.getState();
+		Rails railsState = (Rails) state.getData();
+		if (!isAngle(rail, railsState)) {
+			railsState.setDirection(GoXUtils.getBlockFace(dir), false);
+			state.setData(railsState);
+			state.update();
+		}
+	}
+	
+	public static boolean isAngle(Block rail, Rails state) {
+		if (state.isCurve()) {
+			boolean north, east, south, west;
+			north = GoXUtils.isRails(rail.getRelative(BlockFace.NORTH));
+			east = GoXUtils.isRails(rail.getRelative(BlockFace.EAST));
+			south = GoXUtils.isRails(rail.getRelative(BlockFace.SOUTH));
+			west = GoXUtils.isRails(rail.getRelative(BlockFace.WEST));
+			if (north && east && !west && !south) return true;
+			if (north && west && !east && !south) return true;
+			if (south && east && !west && !north) return true;
+			if (south && west && !east && !north) return true;
+		}
+		return false;
+	}
+	
+	public static void setMinecartDirection(Minecart cart, String dir) {
+		Vector velocity = cart.getVelocity();
+		double speed = velocity.length();
+		Vector newDirection = GoXUtils.getVector(dir).multiply(speed);
+		cart.setVelocity(newDirection);
+	}
+	
+	public static String repathRoutine(GoXPlayer gp, GoXNode currentNode) {
+		gp.getPlayer().sendMessage(ChatColor.YELLOW+GoXChat.chat("searching path"));
+		
+		GoXPath path = GoXMap.FindPath(currentNode.getId(), gp.getDestination());
+		
+		if (path == null || path.IsEmpty()) {
+			gp.reset();
+			gp.getPlayer().sendMessage(ChatColor.RED+GoXChat.chat("path not found"));
+			return null;
+		}
+		
+		gp.getPlayer().sendMessage(ChatColor.GREEN+GoXChat.chat("path found"));
+		
+		String startDirection = path.Pop();
+		gp.setPath(path);
+		gp.setNext(startDirection);
+		gp.setExpected(currentNode.getId());
+		return startDirection;
 	}
 }

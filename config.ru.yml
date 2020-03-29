@@ -1,5 +1,5 @@
 lang:
-  cyrillic decoding: true
+  cyrillic decoding: false
   commands:
     no access: "У вас нет доступа к этой команде!"
     usage: "Использование: "

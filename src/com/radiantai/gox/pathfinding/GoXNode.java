@@ -13,8 +13,6 @@ public class GoXNode {
 	protected GoXNode south;
 	protected GoXNode west;
 	protected String forceDirection;
-	protected GoXNode prev;
-	protected String fromPrev;
 	
 	public GoXNode(Location location) {
 		id = GoXUtils.GenerateId(8);
@@ -29,8 +27,6 @@ public class GoXNode {
 		this.south = south;
 		this.west = west;
 		this.forceDirection = forceDirection;
-		this.prev = null;
-		this.fromPrev = null;
 	}
 
 	protected GoXNode clone() {
@@ -99,24 +95,6 @@ public class GoXNode {
 
 	public void setForceDirection(String forceDirection) {
 		this.forceDirection = forceDirection;
-	}
-
-	public String getFromPrev() {
-		return fromPrev;
-	}
-
-	public GoXNode setFromPrev(String fromPrev) {
-		this.fromPrev = fromPrev;
-		return this;
-	}
-	
-	public GoXNode getPrev() {
-		return prev;
-	}
-
-	public GoXNode setPrev(GoXNode prev) {
-		this.prev = prev;
-		return this;
 	}
 	
 	public GoXNode getLink(String dir) {

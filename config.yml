@@ -1,5 +1,5 @@
 lang:
-   cyrillic decoding: true
+   cyrillic decoding: false
    commands:
       no access: "You don't have permission to use this command!"
       usage: "Usage: "

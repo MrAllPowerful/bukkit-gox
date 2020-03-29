@@ -396,6 +396,9 @@ public class GoM implements CommandExecutor {
 	private void executeFindpath(Player player, String[] args) {
 		try {
 			GoXPath path = GoXMap.FindPath(args[1], args[2]);
+			if (path == null) {
+				throw new Exception("null path");
+			}
 			player.sendMessage(ChatColor.GREEN + path.toString());
 		}
 		catch (Exception e) {

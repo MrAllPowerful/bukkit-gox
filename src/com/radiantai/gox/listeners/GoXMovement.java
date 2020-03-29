@@ -93,8 +93,10 @@ public class GoXMovement implements Listener {
 				
 				String startDirection = GoXUtils.repathRoutine(gp, node);
 				
-				GoXUtils.turnRail(cart, startDirection);
-				GoXUtils.pushCart(cart, startDirection);
+				if (startDirection != null) {
+					GoXUtils.turnRail(cart, startDirection);
+					GoXUtils.pushCart(cart, startDirection);
+				}
 				return;
 			}
 			

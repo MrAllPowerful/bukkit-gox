@@ -11,11 +11,13 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.logging.Logger;
@@ -32,6 +34,7 @@ import org.bukkit.entity.Player;
 
 import com.radiantai.gox.GoX;
 import com.radiantai.gox.chat.GoXChat;
+import com.radiantai.gox.structures.PathNode;
 
 public class GoXMap {
 	private static List<GoXNode> nodes = new ArrayList<GoXNode>();
@@ -226,41 +229,71 @@ public class GoXMap {
 	}
 	
 	public static GoXPath FindPath(String start, String finish) {
-		Queue<GoXNode> searchQueue = new LinkedList<GoXNode>();
-		ArrayList<String> visited = new ArrayList<String>();
-		GoXNode first = GetNode(start).clone();
-		GoXPath path = new GoXPath();
-		int depth = 0;
-		searchQueue.add(first);
-		while (!searchQueue.isEmpty() && depth<=nodes.size()) {
-			GoXNode curr = searchQueue.poll();
-			visited.add(curr.id);
+		Queue<PathNode> openSet = new PriorityQueue<PathNode>();
+		List<String> closeSet = new ArrayList<String>();
+		PathNode first = new PathNode(GetNode(start));
+		GoXNode finishNode = GetNode(finish);
+		first.setDistance(0);
+		first.setEstimated(GoXUtils.getBlockDistance(first.getCurrent().getLocation(), finishNode.getLocation()));
+		openSet.add(first);
+		while (!openSet.isEmpty()) {
+			PathNode currNode = openSet.poll();
+			GoXNode curr = currNode.getCurrent();
+			int distance = currNode.getDistance();
+			closeSet.add(curr.getId());
 			if (curr.getId().equals(finish)) {
-				while (curr.prev != null) {
-					path.Push(curr.getFromPrev());
-					curr = curr.getPrev();
-				}
-				return path;
+				return constructPath(currNode);
 			}
 			if (curr.getForceDirection() == null) {
-				if (curr.getNorth() != null && !visited.contains(curr.getNorth().getId()))
-					searchQueue.add(curr.getNorth().clone().setPrev(curr).setFromPrev("north"));
-				if (curr.getEast() != null && !visited.contains(curr.getEast().getId()))
-					searchQueue.add(curr.getEast().clone().setPrev(curr).setFromPrev("east"));
-				if (curr.getSouth() != null && !visited.contains(curr.getSouth().getId()))
-					searchQueue.add(curr.getSouth().clone().setPrev(curr).setFromPrev("south"));
-				if (curr.getWest() != null && !visited.contains(curr.getWest().getId()))
-					searchQueue.add(curr.getWest().clone().setPrev(curr).setFromPrev("west"));
-			}
-			else { //force direction
-				GoXNode forcedNode = curr.getLink(curr.getForceDirection());
-				if (!visited.contains(forcedNode.getId())) {
-					searchQueue.add(forcedNode.clone().setPrev(curr).setFromPrev(curr.getForceDirection()));
+				if (curr.getNorth() != null && !closeSet.contains(curr.getNorth().getId())) {
+					GoXNode node = curr.getNorth();
+					int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
+					int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+					PathNode pathNode = new PathNode(node, currNode, "north", addedDistance, estimated);
+					openSet.add(pathNode);
+				}
+				if (curr.getEast() != null && !closeSet.contains(curr.getEast().getId())) {
+					GoXNode node = curr.getEast();
+					int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
+					int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+					PathNode pathNode = new PathNode(node, currNode, "east", addedDistance, estimated);
+					openSet.add(pathNode);
+				}
+				if (curr.getSouth() != null && !closeSet.contains(curr.getSouth().getId())) {
+					GoXNode node = curr.getSouth();
+					int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
+					int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+					PathNode pathNode = new PathNode(node, currNode, "south", addedDistance, estimated);
+					openSet.add(pathNode);
+				}
+				if (curr.getWest() != null && !closeSet.contains(curr.getWest().getId())) {
+					GoXNode node = curr.getWest();
+					int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
+					int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+					PathNode pathNode = new PathNode(node, currNode, "west", addedDistance, estimated);
+					openSet.add(pathNode);
 				}
 			}
-			depth++;
+			else { //force direction
+				GoXNode forcedTo = curr.getLink(curr.getForceDirection());
+				if (!closeSet.contains(forcedTo.getId())) {
+					int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), forcedTo.getLocation());
+					int estimated = addedDistance + GoXUtils.getBlockDistance(forcedTo.getLocation(), finishNode.getLocation());
+					PathNode pathNode = new PathNode(forcedTo, currNode, curr.getForceDirection(), addedDistance, estimated);
+					openSet.add(pathNode);
+				}
+			}
 		}
 		return null;
+	}
+	
+	private static GoXPath constructPath(PathNode curr) {
+		GoXPath path = new GoXPath();
+		while (curr.getPrev() != null) {
+			path.Push(curr.getFromPrev());
+			curr = curr.getPrev();
+		}
+		return path;
 	}
 	
 	public static Map<String,GoXStation> GetStations() {
@@ -386,7 +419,7 @@ public class GoXMap {
             String line = null;
             
             nodes = new ArrayList<GoXNode>();
-        	stations = new HashMap<String,GoXStation>();
+        	stations = new TreeMap<String,GoXStation>(String.CASE_INSENSITIVE_ORDER);
 
             while((line = bufferedReader.readLine()) != null) {
             	String id = line;

@@ -1,5 +1,6 @@
 package com.radiantai.gox.pathfinding;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -189,24 +190,27 @@ public class GoXUtils {
 	
 	public static String getPlayerDirection(Player p) {
 		double rot = p.getLocation().getYaw();
+		if (rot < 0) {
+			rot = rot+360;
+		}
 		if (0 <= rot && rot < 22.5) {
-            return "north";
-        } else if (22.5 <= rot && rot < 67.5) {
-            return "northeast";
-        } else if (67.5 <= rot && rot < 112.5) {
-            return "east";
-        } else if (112.5 <= rot && rot < 157.5) {
-            return "southeast";
-        } else if (157.5 <= rot && rot < 202.5) {
             return "south";
-        } else if (202.5 <= rot && rot < 247.5) {
+        } else if (22.5 <= rot && rot < 67.5) {
             return "southwest";
-        } else if (247.5 <= rot && rot < 292.5) {
+        } else if (67.5 <= rot && rot < 112.5) {
             return "west";
-        } else if (292.5 <= rot && rot < 337.5) {
+        } else if (112.5 <= rot && rot < 157.5) {
             return "northwest";
-        } else if (337.5 <= rot && rot < 360.0) {
+        } else if (157.5 <= rot && rot < 202.5) {
             return "north";
+        } else if (202.5 <= rot && rot < 247.5) {
+            return "northeast";
+        } else if (247.5 <= rot && rot < 292.5) {
+            return "east";
+        } else if (292.5 <= rot && rot < 337.5) {
+            return "southeast";
+        } else if (337.5 <= rot && rot < 360.0) {
+            return "south";
         } else {
             return "undefined";
         }

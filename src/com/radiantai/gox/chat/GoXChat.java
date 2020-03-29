@@ -1,8 +1,11 @@
 package com.radiantai.gox.chat;
 
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -119,9 +122,9 @@ public class GoXChat {
 		int i = 0;
 		int starting = (page-1)*max;
 		int last = starting+max-1;
-		for (GoXStation st : stations.values()) {
+		for (String key : stations.keySet()) {
 			if (starting<=i) {
-				fancyStationCompact(p, st);
+				fancyStationCompact(p, stations.get(key));
 			}
 			if (last==i) break;
 			i++;

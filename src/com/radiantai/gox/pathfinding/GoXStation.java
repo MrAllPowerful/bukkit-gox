@@ -4,7 +4,7 @@ import org.bukkit.Location;
 
 import com.radiantai.gox.chat.GoXChat;
 
-public class GoXStation extends GoXNode {
+public class GoXStation extends GoXNode implements Comparable<GoXStation> {
 	private String name;
 	private Location dropPoint;
 	
@@ -50,5 +50,10 @@ public class GoXStation extends GoXNode {
 		return "STATION> Name: "+name
 				+" Id: "+id+" X: "+ location.getBlockX() + " Y: " + location.getBlockY() + " Z: "+location.getBlockZ()+" North: "
 				+norths+" East: "+easts+" South: "+souths+" West: "+wests;
+	}
+
+	@Override
+	public int compareTo(GoXStation o) {
+		return this.GetName().compareTo(o.GetName());
 	}
 }

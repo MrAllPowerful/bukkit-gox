@@ -12,7 +12,7 @@ public class GoXNode {
 	protected GoXNode east;
 	protected GoXNode south;
 	protected GoXNode west;
-	protected boolean visited;
+	protected String forceDirection;
 	protected GoXNode prev;
 	protected String fromPrev;
 	
@@ -21,20 +21,20 @@ public class GoXNode {
 		this.location = GoXUtils.floorLocation(location);
 	}
 	
-	public GoXNode(String id, Location location, GoXNode north, GoXNode east, GoXNode south, GoXNode west) {
+	public GoXNode(String id, Location location, GoXNode north, GoXNode east, GoXNode south, GoXNode west, String forceDirection) {
 		this.id = id;
 		this.location = GoXUtils.floorLocation(location);
 		this.north = north;
 		this.east = east;
 		this.south = south;
 		this.west = west;
-		this.visited = false;
+		this.forceDirection = forceDirection;
 		this.prev = null;
 		this.fromPrev = null;
 	}
 
 	protected GoXNode clone() {
-		return new GoXNode(id, location, north, east, south, west);
+		return new GoXNode(id, location, north, east, south, west, forceDirection);
 	}
 
 	public String getId(){
@@ -91,6 +91,14 @@ public class GoXNode {
 
 	public void SetWest(GoXNode west) {
 		this.west = west;
+	}
+
+	public String getForceDirection() {
+		return forceDirection;
+	}
+
+	public void setForceDirection(String forceDirection) {
+		this.forceDirection = forceDirection;
 	}
 
 	public String getFromPrev() {
@@ -153,6 +161,20 @@ public class GoXNode {
 			if (west != null && west.getId().equals(id))
 				west = null;
 		}
+	}
+	
+	public String isLinked(String id) {
+		if (id != null) {
+			if (north != null && north.getId().equals(id))
+				return "north";
+			if (east != null && east.getId().equals(id))
+				return "east";
+			if (south != null && south.getId().equals(id))
+				return "south";
+			if (west != null && west.getId().equals(id))
+				return "west";
+		}
+		return null;
 	}
 
 	public String toString() {

@@ -36,7 +36,7 @@ public class GoXChat {
 			p.sendMessage(ChatColor.YELLOW+"<"+chat("empty")+">");
 			return;
 		}
-		p.sendMessage(ChatColor.GREEN+" "+((GoXStation) station).GetName());
+		p.sendMessage(ChatColor.GREEN+"  "+((GoXStation) station).GetName());
 	}
 	
 	public static void fancyStation(Player p, GoXStation station) {
@@ -70,6 +70,16 @@ public class GoXChat {
 		p.sendMessage("   "+ChatColor.YELLOW+chat("east")+":"+ChatColor.GREEN+" "+(station.getEast() != null ? station.getEast().getId() : "-"));
 		p.sendMessage("   "+ChatColor.YELLOW+chat("south")+":"+ChatColor.GREEN+" "+(station.getSouth() != null ? station.getSouth().getId() : "-"));
 		p.sendMessage("   "+ChatColor.YELLOW+chat("west")+":"+ChatColor.GREEN+" "+(station.getWest() != null ? station.getWest().getId() : "-"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("force")+":"+ChatColor.GREEN+" "+(station.getForceDirection() != null ? station.getForceDirection() : "-"));
+		p.sendMessage(" "+ChatColor.GRAY+chat("drop point")+":");
+		if (station.getDropPoint() != null) {
+			p.sendMessage("   "+ChatColor.YELLOW+chat("x")+":"+ChatColor.GREEN+" "+station.getDropPoint().getX());
+			p.sendMessage("   "+ChatColor.YELLOW+chat("y")+":"+ChatColor.GREEN+" "+station.getDropPoint().getY());
+			p.sendMessage("   "+ChatColor.YELLOW+chat("z")+":"+ChatColor.GREEN+" "+station.getDropPoint().getZ());
+		}
+		else {
+			p.sendMessage("   "+ChatColor.YELLOW+chat("empty"));
+		}
 	}
 	
 	public static void fancyNodeExtended(Player p, GoXNode node) {
@@ -92,6 +102,7 @@ public class GoXChat {
 		p.sendMessage("   "+ChatColor.YELLOW+chat("east")+":"+ChatColor.GREEN+" "+(node.getEast() != null ? node.getEast().getId() : "-"));
 		p.sendMessage("   "+ChatColor.YELLOW+chat("south")+":"+ChatColor.GREEN+" "+(node.getSouth() != null ? node.getSouth().getId() : "-"));
 		p.sendMessage("   "+ChatColor.YELLOW+chat("west")+":"+ChatColor.GREEN+" "+(node.getWest() != null ? node.getWest().getId() : "-"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("force")+":"+ChatColor.GREEN+" "+(node.getForceDirection() != null ? node.getForceDirection() : "-"));
 	}
 	
 	public static void stationList(Player p, int page, int max) {

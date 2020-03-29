@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Rails;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
@@ -25,6 +26,7 @@ import com.radiantai.gox.chat.GoXChat;
 import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.pathfinding.GoXNode;
 import com.radiantai.gox.pathfinding.GoXPath;
+import com.radiantai.gox.pathfinding.GoXStation;
 import com.radiantai.gox.pathfinding.GoXUtils;
 import com.radiantai.gox.structures.GoXPlayer;
 import com.radiantai.gox.structures.RollingQueue;
@@ -61,8 +63,17 @@ public class GoXMovement implements Listener {
 		if (hasArrived(gp)) {
 			gp.reset();
 			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("arrived"));
-			GoXChat.fancyStationCompact(player, node);
 			GoXUtils.stopCart(cart);
+			if (node instanceof GoXStation) {
+				Location drop = ((GoXStation) node).getDropPoint();
+				if (drop != null) {
+					player.leaveVehicle();
+					player.teleport(drop);
+					cart.remove();
+					player.getInventory().addItem(new ItemStack(Material.MINECART));
+				}
+			}
+			GoXChat.fancyStationCompact(player, node);
 			return;
 		}
 		

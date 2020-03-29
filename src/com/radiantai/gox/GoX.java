@@ -41,7 +41,7 @@ public class GoX extends JavaPlugin {
 		GoXMap.FromFile(mapFilePath, mapFileName);
 		GoXChat.setupChat(this);
 		
-		scheduleBackup();
+		//scheduleBackup();
 	}
 	
 	private void registerCommands() {

@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ import com.radiantai.gox.chat.GoXChat;
 
 public class GoXMap {
 	private static List<GoXNode> nodes = new ArrayList<GoXNode>();
-	private static Map<String, GoXStation> stations = new HashMap<String,GoXStation>();
+	private static Map<String, GoXStation> stations = new TreeMap<String,GoXStation>(String.CASE_INSENSITIVE_ORDER);
 	private static GoX plugin;
 	private static ConfigurationSection config;
 	private static Logger logger;
@@ -92,7 +93,7 @@ public class GoXMap {
 	
 	public static void RemoveStation(String name) throws Exception {
 		if (stations != null) {
-			GoXStation st = stations.get(name);
+			GoXStation st = stations.get(name.toLowerCase());
 			if (st == null) {
 				throw new Exception(GoXChat.chat("no such station"));
 			}
@@ -154,7 +155,7 @@ public class GoXMap {
 	}
 	
 	public static GoXStation GetStation(String name) {
-		GoXStation st = stations.get(name);
+		GoXStation st = stations.get(name.toLowerCase());
 		return st;
 	}
 	
@@ -229,8 +230,9 @@ public class GoXMap {
 		ArrayList<String> visited = new ArrayList<String>();
 		GoXNode first = GetNode(start).clone();
 		GoXPath path = new GoXPath();
+		int depth = 0;
 		searchQueue.add(first);
-		while (!searchQueue.isEmpty()) {
+		while (!searchQueue.isEmpty() && depth<=nodes.size()) {
 			GoXNode curr = searchQueue.poll();
 			visited.add(curr.id);
 			if (curr.getId().equals(finish)) {
@@ -240,14 +242,23 @@ public class GoXMap {
 				}
 				return path;
 			}
-			if (curr.getNorth() != null && !visited.contains(curr.getNorth().getId()))
-				searchQueue.add(curr.getNorth().clone().setPrev(curr).setFromPrev("north"));
-			if (curr.getEast() != null && !visited.contains(curr.getEast().getId()))
-				searchQueue.add(curr.getEast().clone().setPrev(curr).setFromPrev("east"));
-			if (curr.getSouth() != null && !visited.contains(curr.getSouth().getId()))
-				searchQueue.add(curr.getSouth().clone().setPrev(curr).setFromPrev("south"));
-			if (curr.getWest() != null && !visited.contains(curr.getWest().getId()))
-				searchQueue.add(curr.getWest().clone().setPrev(curr).setFromPrev("west"));
+			if (curr.getForceDirection() == null) {
+				if (curr.getNorth() != null && !visited.contains(curr.getNorth().getId()))
+					searchQueue.add(curr.getNorth().clone().setPrev(curr).setFromPrev("north"));
+				if (curr.getEast() != null && !visited.contains(curr.getEast().getId()))
+					searchQueue.add(curr.getEast().clone().setPrev(curr).setFromPrev("east"));
+				if (curr.getSouth() != null && !visited.contains(curr.getSouth().getId()))
+					searchQueue.add(curr.getSouth().clone().setPrev(curr).setFromPrev("south"));
+				if (curr.getWest() != null && !visited.contains(curr.getWest().getId()))
+					searchQueue.add(curr.getWest().clone().setPrev(curr).setFromPrev("west"));
+			}
+			else { //force direction
+				GoXNode forcedNode = curr.getLink(curr.getForceDirection());
+				if (!visited.contains(forcedNode.getId())) {
+					searchQueue.add(forcedNode.clone().setPrev(curr).setFromPrev(curr.getForceDirection()));
+				}
+			}
+			depth++;
 		}
 		return null;
 	}
@@ -320,10 +331,8 @@ public class GoXMap {
 		    	  nodeWriter.newLine();
 		    	  nodeWriter.write(node.getWorld()+"");
 		    	  nodeWriter.newLine();
-		    	  nodeWriter.write(node.getX()+"");
-		    	  nodeWriter.newLine();
-		    	  nodeWriter.write(node.getY()+"");
-		    	  nodeWriter.newLine();
+		    	  nodeWriter.write(node.getX()+",");
+		    	  nodeWriter.write(node.getY()+",");
 		    	  nodeWriter.write(node.getZ()+"");
 		    	  nodeWriter.newLine();
 		    	  nodeWriter.write(node.getNorth()!=null?node.getNorth().getId():"null");
@@ -333,6 +342,25 @@ public class GoXMap {
 		    	  nodeWriter.write(node.getSouth()!=null?node.getSouth().getId():"null");
 		    	  nodeWriter.newLine();
 		    	  nodeWriter.write(node.getWest()!=null?node.getWest().getId():"null");
+		    	  nodeWriter.newLine();
+		    	  nodeWriter.write(node.getForceDirection()!=null?node.getForceDirection():"null");
+		    	  nodeWriter.newLine();
+		    	  if (node instanceof GoXStation) {
+		    		  GoXStation st = (GoXStation) node;
+		    		  if (st.getDropPoint()!= null) {
+		    			  nodeWriter.write(st.getDropPoint().getX()+",");
+			    		  nodeWriter.write(st.getDropPoint().getY()+",");
+			    		  nodeWriter.write(st.getDropPoint().getZ()+",");
+			    		  nodeWriter.write(st.getDropPoint().getYaw()+",");
+			    		  nodeWriter.write(st.getDropPoint().getPitch()+"");
+		    		  }
+		    		  else {
+		    			  nodeWriter.write("null");
+		    		  }
+		    	  }
+		    	  else {
+		    		  nodeWriter.write("null");
+		    	  }
 		    	  nodeWriter.newLine();
 			}
 		      	nodeWriter.close();
@@ -367,25 +395,37 @@ public class GoXMap {
             	line = bufferedReader.readLine();
             	String worldName = line;
             	line = bufferedReader.readLine();
-            	int x = Integer.parseInt(line);
+            	String[] tokens = line.split(",");
+            	int x = Integer.parseInt(tokens[0]);
+            	int y = Integer.parseInt(tokens[1]);
+            	int z = Integer.parseInt(tokens[2]);
+            	bufferedReader.readLine();
+            	bufferedReader.readLine();
+            	bufferedReader.readLine();
+            	bufferedReader.readLine();
             	line = bufferedReader.readLine();
-            	int y = Integer.parseInt(line);
+            	String forceDirection = line.equals("null") ? null : line;
             	line = bufferedReader.readLine();
-            	int z = Integer.parseInt(line);
-            	bufferedReader.readLine();
-            	bufferedReader.readLine();
-            	bufferedReader.readLine();
-            	bufferedReader.readLine();
+            	Location locationD = null;
+            	tokens = line.split(",");
+            	if (!line.equals("null")) {
+            		double xd = Double.parseDouble(tokens[0]);
+                	double yd = Double.parseDouble(tokens[1]);
+                	double zd = Double.parseDouble(tokens[2]);
+                	float yaw = Float.parseFloat(tokens[3]);
+                	float pitch = Float.parseFloat(tokens[4]);
+                	locationD = new Location(Bukkit.getWorld(worldName),xd,yd,zd,yaw,pitch);
+            	}
             	
             	Location location = new Location(Bukkit.getWorld(worldName),x,y,z);
             	
             	if (!stationName.equals("null")) {
-            		GoXStation newStation = new GoXStation(id, location, null, null, null, null, stationName);
+            		GoXStation newStation = new GoXStation(id, location, null, null, null, null, stationName, forceDirection, locationD);
             		stations.put(stationName, newStation);
             		nodes.add(newStation);
             	}
             	else {
-            		GoXNode newNode = new GoXNode(id, location, null, null, null, null);
+            		GoXNode newNode = new GoXNode(id, location, null, null, null, null, forceDirection);
             		nodes.add(newNode);
             	}
             }   
@@ -403,9 +443,7 @@ public class GoXMap {
             	line = bufferedReader.readLine();
             	String stationName = line;
             	line = bufferedReader.readLine(); //worldName
-            	line = bufferedReader.readLine(); //x
-            	line = bufferedReader.readLine(); //y
-            	line = bufferedReader.readLine(); //z
+            	line = bufferedReader.readLine(); //location
             	line = bufferedReader.readLine();
             	String northId = line;
             	line = bufferedReader.readLine();
@@ -414,6 +452,8 @@ public class GoXMap {
             	String southId = line;
             	line = bufferedReader.readLine();
             	String westId = line;
+            	line = bufferedReader.readLine(); //forceDirection
+            	line = bufferedReader.readLine(); //dropPoint
             	GoXNode target = GetNode(id);
             	if (!northId.equals("null")) {
             		GoXNode north = GetNode(northId);

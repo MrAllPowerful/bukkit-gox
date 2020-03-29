@@ -41,6 +41,7 @@ lang:
     east: "Восток"
     south: "Юг"
     west: "Запад"
+    force: "Принудительное направление"
     name: "Название"
     no such command: "Нет такой подкоманды для: "
     name reserved: "Вы не можете использовать это название!"
@@ -61,6 +62,12 @@ lang:
     invalid direction: "Доступные направления: north, east, south, west!"
     no link: "Этот узел ни с чем не связан в указанном направлении!"
     unlink success: "Связь удалена!"
+    force success: "Принудительный выбор направления установлен!"
+    unforce success: "Принудительный выбор направления удален!"
+    drop point: "Точка высадки"
+    drop point success: "Установлена точка высадки!"
+    drop same world: "Точка высадки должна находиться в одном мире со станцией!"
+    drop distance: "Точка высадки должна находиться не далее:"
 config:
   prohibited stations:
   - cancel

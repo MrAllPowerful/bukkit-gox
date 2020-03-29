@@ -25,6 +25,7 @@ import com.radiantai.gox.chat.GoXChat;
 import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.pathfinding.GoXNode;
 import com.radiantai.gox.pathfinding.GoXPath;
+import com.radiantai.gox.pathfinding.GoXStation;
 import com.radiantai.gox.pathfinding.GoXUtils;
 import com.radiantai.gox.structures.GoXPlayer;
 
@@ -94,6 +95,15 @@ public class GoM implements CommandExecutor {
 			case "findpath":
 				executeFindpath(player, args);
 				break;
+			case "force":
+				executeForce(player, args);
+				break;
+			case "unforce":
+				executeUnforce(player, args);
+				break;
+			case "setdrop":
+				executeSetdrop(player, args);
+				break;
 			default:
 				player.sendMessage(ChatColor.RED + GoXChat.chat("no such command") + ChatColor.WHITE + "/gom");
 			}
@@ -103,6 +113,68 @@ public class GoM implements CommandExecutor {
 		}
 	}
 	
+	private void executeSetdrop(Player player, String[] args) {
+		if (args.length < 2) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom setdrop <name>");
+			return;
+		}
+		GoXStation st = GoXMap.GetStation(args[1]);
+		
+		if (st == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("no such station"));
+			return;
+		}
+		
+		Location location = player.getLocation();
+		
+		try {
+			st.setDropPoint(location);
+		}
+		catch (Exception e) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
+			return;
+		}
+		
+		player.sendMessage(ChatColor.GREEN+GoXChat.chat("drop point success"));
+		
+	}
+
+	private void executeUnforce(Player player, String[] args) {
+		Location location = player.getLocation();
+		GoXNode node = GoXMap.GetNode(location);
+		
+		if (node == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("stand over"));
+			return;
+		}
+		
+		node.setForceDirection(null);
+		
+		player.sendMessage(ChatColor.GREEN+GoXChat.chat("unforce success"));
+	}
+
+	private void executeForce(Player player, String[] args) {
+		String dir = GoXUtils.getPlayerDirection(player);
+		
+		if (!GoXUtils.isValidDirection(dir)) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction"));
+			return;
+		}
+		
+		Location location = player.getLocation();
+		GoXNode node = GoXMap.GetNode(location);
+		
+		if (node == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("stand over"));
+			return;
+		}
+		
+		node.setForceDirection(dir);
+		
+		player.sendMessage(ChatColor.GREEN+GoXChat.chat("force success"));
+		
+	}
+
 	private void executeAdd(Player player, String[] args) {
 		if (player.hasMetadata("go_add")) {
 			
@@ -205,7 +277,7 @@ public class GoM implements CommandExecutor {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom unlink <direction>");
 			return;
 		}
-		String dir = args[1];
+		String dir = args[1].toLowerCase();
 		
 		if (!GoXUtils.isValidDirection(dir)) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction"));
@@ -242,7 +314,7 @@ public class GoM implements CommandExecutor {
 			return;
 		}
 		
-		String id = args[1];
+		String id = args[1].toLowerCase();
 		
 		Location location = player.getLocation();
 		GoXNode from = GoXMap.GetNode(location);

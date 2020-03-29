@@ -8,7 +8,6 @@ lang:
       sit: "Sit in a cart on a station and run over a control block."
       canceled: "Canceled!"
       destination: "Current destination: "
-      invalid direction: "Invalid direction: "
       place block: "Place a node-block and a rail first!"
       place station: "Place a station-block and a rail first!"
       adding node: "Adding a new node..."
@@ -50,7 +49,7 @@ lang:
       already name: "There is already a station with the same name!"
       no such station: "There is no such station!"
       cannot remove node: "You cannot remove node that is a station, use removestation command!"
-      no such node: "There is no such node!"
+      no such node: "There is no such node"
       to itself: "You cannot link a node to itself!"
       one line: "Linked nodes must lay on one line!"
       empty: "empty"
@@ -59,6 +58,10 @@ lang:
       list: "List"
       invalid name: "Station name is invalid! Requirements: length: < 16, characters: letters, numbers, _."
       repath: "Oops! Did you miss a turn? Let us fix it..."
+      cannot touch: "New node cannot touch any other existing nodes!"
+      invalid direction: "Valid directions: north, east, south, west!"
+      no link: "This node has no links in specified direction!"
+      unlink success: "Link removed!"
 config:
    prohibited stations:
       - "cancel"

@@ -45,11 +45,11 @@ public class GoXChat {
 			return;
 		}
 		p.sendMessage(ChatColor.DARK_GREEN+chat("station")+":");
-		p.sendMessage("  "+ChatColor.YELLOW+chat("name")+":"+ChatColor.GREEN+" "+station.GetName());
-		p.sendMessage("  "+ChatColor.YELLOW+chat("id")+":"+ChatColor.GREEN+" "+station.getId());
-		p.sendMessage("  "+ChatColor.GRAY+chat("location"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("x")+":"+ChatColor.GREEN+" "+station.getX());
-		p.sendMessage("    "+ChatColor.YELLOW+chat("y")+":"+ChatColor.GREEN+" "+station.getY());
+		p.sendMessage(" "+ChatColor.YELLOW+chat("name")+":"+ChatColor.GREEN+" "+station.GetName());
+		p.sendMessage(" "+ChatColor.YELLOW+chat("id")+":"+ChatColor.GREEN+" "+station.getId());
+		p.sendMessage(" "+ChatColor.GRAY+chat("location"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("x")+":"+ChatColor.GREEN+" "+station.getX());
+		p.sendMessage("   "+ChatColor.YELLOW+chat("y")+":"+ChatColor.GREEN+" "+station.getY());
 		p.sendMessage("   "+ChatColor.YELLOW+chat("z")+":"+ChatColor.GREEN+" "+station.getZ());;
 	}
 	
@@ -59,17 +59,17 @@ public class GoXChat {
 			return;
 		}
 		p.sendMessage(ChatColor.DARK_GREEN+chat("station")+":");
-		p.sendMessage("  "+ChatColor.YELLOW+chat("name")+":"+ChatColor.GREEN+" "+station.GetName());
-		p.sendMessage("  "+ChatColor.YELLOW+chat("id")+":"+ChatColor.GREEN+" "+station.getId());
-		p.sendMessage("  "+ChatColor.GRAY+chat("location"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("x")+":"+ChatColor.GREEN+" "+station.getX());
-		p.sendMessage("    "+ChatColor.YELLOW+chat("y")+":"+ChatColor.GREEN+" "+station.getY());
-		p.sendMessage("    "+ChatColor.YELLOW+chat("z")+":"+ChatColor.GREEN+" "+station.getZ());
-		p.sendMessage("  "+ChatColor.GRAY+chat("connection"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("north")+":"+ChatColor.GREEN+" "+(station.getNorth() != null ? station.getNorth().getId() : "-"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("east")+":"+ChatColor.GREEN+" "+(station.getEast() != null ? station.getEast().getId() : "-"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("south")+":"+ChatColor.GREEN+" "+(station.getSouth() != null ? station.getSouth().getId() : "-"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("west")+":"+ChatColor.GREEN+" "+(station.getWest() != null ? station.getWest().getId() : "-"));
+		p.sendMessage(" "+ChatColor.YELLOW+chat("name")+":"+ChatColor.GREEN+" "+station.GetName());
+		p.sendMessage(" "+ChatColor.YELLOW+chat("id")+":"+ChatColor.GREEN+" "+station.getId());
+		p.sendMessage(" "+ChatColor.GRAY+chat("location"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("x")+":"+ChatColor.GREEN+" "+station.getX());
+		p.sendMessage("   "+ChatColor.YELLOW+chat("y")+":"+ChatColor.GREEN+" "+station.getY());
+		p.sendMessage("   "+ChatColor.YELLOW+chat("z")+":"+ChatColor.GREEN+" "+station.getZ());
+		p.sendMessage(" "+ChatColor.GRAY+chat("connection"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("north")+":"+ChatColor.GREEN+" "+(station.getNorth() != null ? station.getNorth().getId() : "-"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("east")+":"+ChatColor.GREEN+" "+(station.getEast() != null ? station.getEast().getId() : "-"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("south")+":"+ChatColor.GREEN+" "+(station.getSouth() != null ? station.getSouth().getId() : "-"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("west")+":"+ChatColor.GREEN+" "+(station.getWest() != null ? station.getWest().getId() : "-"));
 	}
 	
 	public static void fancyNodeExtended(Player p, GoXNode node) {
@@ -82,16 +82,16 @@ public class GoXChat {
 			return;
 		}
 		p.sendMessage(ChatColor.DARK_BLUE+chat("node")+":");
-		p.sendMessage("  "+ChatColor.YELLOW+chat("id")+":"+ChatColor.GREEN+" "+node.getId());
-		p.sendMessage("  "+ChatColor.GRAY+chat("location"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("x")+":"+ChatColor.GREEN+" "+node.getX());
-		p.sendMessage("    "+ChatColor.YELLOW+chat("y")+":"+ChatColor.GREEN+" "+node.getY());
-		p.sendMessage("    "+ChatColor.YELLOW+chat("z")+":"+ChatColor.GREEN+" "+node.getZ());
-		p.sendMessage("  "+ChatColor.GRAY+chat("connection"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("north")+":"+ChatColor.GREEN+" "+(node.getNorth() != null ? node.getNorth().getId() : "-"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("east")+":"+ChatColor.GREEN+" "+(node.getEast() != null ? node.getEast().getId() : "-"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("south")+":"+ChatColor.GREEN+" "+(node.getSouth() != null ? node.getSouth().getId() : "-"));
-		p.sendMessage("    "+ChatColor.YELLOW+chat("west")+":"+ChatColor.GREEN+" "+(node.getWest() != null ? node.getWest().getId() : "-"));
+		p.sendMessage(" "+ChatColor.YELLOW+chat("id")+":"+ChatColor.GREEN+" "+node.getId());
+		p.sendMessage(" "+ChatColor.GRAY+chat("location"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("x")+":"+ChatColor.GREEN+" "+node.getX());
+		p.sendMessage("   "+ChatColor.YELLOW+chat("y")+":"+ChatColor.GREEN+" "+node.getY());
+		p.sendMessage("   "+ChatColor.YELLOW+chat("z")+":"+ChatColor.GREEN+" "+node.getZ());
+		p.sendMessage(" "+ChatColor.GRAY+chat("connection"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("north")+":"+ChatColor.GREEN+" "+(node.getNorth() != null ? node.getNorth().getId() : "-"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("east")+":"+ChatColor.GREEN+" "+(node.getEast() != null ? node.getEast().getId() : "-"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("south")+":"+ChatColor.GREEN+" "+(node.getSouth() != null ? node.getSouth().getId() : "-"));
+		p.sendMessage("   "+ChatColor.YELLOW+chat("west")+":"+ChatColor.GREEN+" "+(node.getWest() != null ? node.getWest().getId() : "-"));
 	}
 	
 	public static void stationList(Player p, int page, int max) {

@@ -1,7 +1,5 @@
 package com.radiantai.gox.pathfinding;
 
-import java.util.UUID;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,15 +13,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.material.Rails;
 import org.bukkit.util.Vector;
 
-import com.radiantai.gox.GoX;
 import com.radiantai.gox.chat.GoXChat;
 import com.radiantai.gox.structures.GoXPlayer;
 
 public class GoXUtils {
 	
 	public static String GenerateId(int length) {
-		String uuid = UUID.randomUUID().toString().substring(0, length-1);
-		return uuid;
+		
+		String sample = "0123456789abcdefghijklmnopqrstuvxyz"; 
+		String s = ""; 
+		
+		for (int i = 0; i < length; i++) { 
+			int index = (int)(sample.length()*Math.random()); 
+			s += sample.charAt(index); 
+		}
+		
+		return s;
 	}
 	
 	public static boolean validateName(String name) {
@@ -43,6 +48,7 @@ public class GoXUtils {
 	}
 	
 	public static Vector getVector(String dir) {
+		dir = dir.toLowerCase();
 		switch (dir) {
 		case "north":
 			return new Vector(0,0,-1);
@@ -57,6 +63,7 @@ public class GoXUtils {
 	}
 	
 	public static BlockFace getBlockFace(String dir) {
+		dir = dir.toLowerCase();
 		switch (dir) {
 		case "north":
 			return BlockFace.NORTH;
@@ -112,11 +119,13 @@ public class GoXUtils {
 	}
 	
 	public static void pushCart(Minecart cart, String dir) {
+		dir = dir.toLowerCase();
 		Vector v = GoXUtils.getVector(dir).multiply(cart.getMaxSpeed()*0.7);
 		cart.setVelocity(v);
 	}
 	
 	public static void turnRail(Minecart cart, String dir) {
+		dir = dir.toLowerCase();
 		Block rail = cart.getLocation().getBlock();
 		BlockState state = rail.getState();
 		Rails railsState = (Rails) state.getData();
@@ -143,6 +152,7 @@ public class GoXUtils {
 	}
 	
 	public static void setMinecartDirection(Minecart cart, String dir) {
+		dir = dir.toLowerCase();
 		Vector velocity = cart.getVelocity();
 		double speed = velocity.length();
 		Vector newDirection = GoXUtils.getVector(dir).multiply(speed);

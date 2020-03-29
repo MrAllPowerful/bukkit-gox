@@ -85,6 +85,9 @@ public class GoM implements CommandExecutor {
 			case "link":
 				executeLink(player, args);
 				break;
+			case "unlink":
+				executeUnlink(player, args);
+				break;
 			case "info":
 				executeInfo(player, args);
 				break;
@@ -197,40 +200,108 @@ public class GoM implements CommandExecutor {
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("removing success"));
 	}
 	
-	private void executeLink(Player player, String[] args) {
-		if (args.length < 3) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <x> <z>");
+	private void executeUnlink(Player player, String[] args) {
+		if (args.length < 2) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom unlink <direction>");
 			return;
 		}
-		int x,z;
-		try {
-			x = Integer.parseInt(args[1]);
-			z = Integer.parseInt(args[2]);
-		}
-		catch (Exception e) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <number> <number>");
+		String dir = args[1];
+		
+		if (!GoXUtils.isValidDirection(dir)) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction"));
 			return;
 		}
 		
 		Location location = player.getLocation();
 		GoXNode node = GoXMap.GetNode(location);
-		GoXNode to = GoXMap.GetNode(new Location(location.getWorld(),x,0,z));
+		
+		if (node == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("stand over"));
+			return;
+		}
+		
+		GoXNode linked = node.getLink(dir);
+		
+		if (linked == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("no link"));
+			return;
+		}
+		
+		node.setLink(dir, null);
+		linked.unlink(node.getId());
+		player.sendMessage(ChatColor.GREEN+GoXChat.chat("unlink success"));
+	}
+	
+	private void executeLink(Player player, String[] args) {
+		if (args.length < 2) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <from-id> <direction> <to-id> <direction>");
+			return;
+		}
+		else if (args.length > 2) {
+			executeManualLink(player, args);
+			return;
+		}
+		
+		String id = args[1];
+		
+		Location location = player.getLocation();
+		GoXNode from = GoXMap.GetNode(location);
+		GoXNode to = GoXMap.GetNode(id);
 		if (to == null) {
 			player.sendMessage(ChatColor.RED+GoXChat.chat("no such node"));
 			return;
 		}
-		if (node == null) {
+		if (from == null) {
 			player.sendMessage(ChatColor.RED+GoXChat.chat("stand over"));
 			return;
 		}
 		player.sendMessage(ChatColor.YELLOW+GoXChat.chat("linking"));
 		try {
-			GoXMap.LinkNodes(node, to);
+			GoXMap.LinkNodes(from, to);
 		}
 		catch (Exception e) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
 			return;
 		}
+		player.sendMessage(ChatColor.GREEN+GoXChat.chat("linking success"));
+	}
+	
+	private void executeManualLink(Player player, String[] args) {
+		if (args.length < 5) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <from-id> <direction> <to-id> <direction>");
+			return;
+		}
+		String fromId = args[1].toLowerCase();
+		String fromDir = args[2].toLowerCase();
+		String toId = args[3].toLowerCase();
+		String toDir = args[4].toLowerCase();
+		
+		if (!GoXUtils.isValidDirection(fromDir) || !GoXUtils.isValidDirection(toDir)) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction"));
+			return;
+		}
+		
+		GoXNode from = GoXMap.GetNode(fromId);
+		GoXNode to = GoXMap.GetNode(toId);
+		
+		if (from == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("no such node")+": "+fromId);
+			return;
+		}
+		if (to == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("no such node")+": "+toId);
+			return;
+		}
+		
+		player.sendMessage(ChatColor.YELLOW+GoXChat.chat("linking"));
+		try {
+			GoXMap.LinkNodesManual(from, fromDir, to, toDir);
+		}
+		catch (Exception e) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
+			return;
+		}
+		
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("linking success"));
 	}
 	

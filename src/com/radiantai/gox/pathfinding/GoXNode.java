@@ -17,7 +17,7 @@ public class GoXNode {
 	protected String fromPrev;
 	
 	public GoXNode(Location location) {
-		id = GoXUtils.GenerateId(16);
+		id = GoXUtils.GenerateId(8);
 		this.location = GoXUtils.floorLocation(location);
 	}
 	
@@ -123,6 +123,36 @@ public class GoXNode {
 				return west;
 		}
 		return null;
+	}
+	
+	public void setLink(String dir, GoXNode node) {
+		switch (dir) {
+			case "north":
+				north = node;
+				break;
+			case "east":
+				east = node;
+				break;
+			case "south":
+				south = node;
+				break;
+			case "west":
+				west = node;
+				break;
+		}
+	}
+	
+	public void unlink(String id) {
+		if (id != null) {
+			if (north != null && north.getId().equals(id))
+				north = null;
+			if (east != null && east.getId().equals(id))
+				east = null;
+			if (south != null && south.getId().equals(id))
+				south = null;
+			if (west != null && west.getId().equals(id))
+				west = null;
+		}
 	}
 
 	public String toString() {

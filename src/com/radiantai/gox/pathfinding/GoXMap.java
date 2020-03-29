@@ -54,6 +54,9 @@ public class GoXMap {
 		if (node != null) {
 			throw new Exception(GoXChat.chat("already location"));
 		}
+		if (isNearby(location)) {
+			throw new Exception(GoXChat.chat("cannot touch"));
+		}
 		nodes.add(new GoXNode(location));
 	}
 	
@@ -78,6 +81,9 @@ public class GoXMap {
 		List<String> reserved = config.getStringList("prohibited stations");
 		if (reserved.contains(idName)) {
 			throw new Exception(GoXChat.chat("name reserved"));
+		}
+		if (isNearby(location)) {
+			throw new Exception(GoXChat.chat("cannot touch"));
 		}
 		GoXStation newst = new GoXStation(name, location);
 		nodes.add(newst);
@@ -106,20 +112,20 @@ public class GoXMap {
 	private static void RemoveNodeP(String id) throws Exception {
 		if (nodes != null) {
 			GoXNode node = GetNode(id);
-			if (node.north != null) {
-				node.north.SetSouth(null);
-			}
-			if (node.south != null) {
-				node.south.SetNorth(null);
-			}
-			if (node.east != null) {
-				node.east.SetWest(null);
-			}
-			if (node.west != null) {
-				node.west.SetEast(null);
-			}
 			if (!nodes.removeIf(n -> (n.getId() == id))) {
 				throw new Exception(GoXChat.chat("no such node"));
+			}
+			if (node.north != null) {
+				node.north.unlink(id);
+			}
+			if (node.south != null) {
+				node.south.unlink(id);
+			}
+			if (node.east != null) {
+				node.east.unlink(id);
+			}
+			if (node.west != null) {
+				node.west.unlink(id);
 			}
 		}
 	}
@@ -154,7 +160,7 @@ public class GoXMap {
 	
 	
 	public static void LinkNodes(GoXNode from, GoXNode to) throws Exception {
-		if (from.getX()==to.getX() && from.getZ()==to.getZ()) {
+		if (from.getId().equals(to.getId())) {
 			throw new Exception(GoXChat.chat("to itself"));
 		}
 		if (from.getZ()==to.getZ()) {
@@ -180,6 +186,18 @@ public class GoXMap {
 		else {
 			throw new Exception(GoXChat.chat("one line"));
 		}
+	}
+	
+	public static void LinkNodesManual(GoXNode from, String fromDir, GoXNode to, String toDir) throws Exception {
+		fromDir = fromDir.toLowerCase();
+		toDir = toDir.toLowerCase();
+		
+		if (from.getId().equals(to.getId())) {
+			throw new Exception(GoXChat.chat("to itself"));
+		}
+		
+		from.setLink(fromDir, to);
+		to.setLink(toDir, from);
 	}
 	
 	public static void MessageNodes(Player player) {
@@ -258,14 +276,27 @@ public class GoXMap {
 		}
 	}
 	
-	public boolean isNearby(Location location) {
+	public static boolean isNearby(Location location) {
 		Block block = location.getBlock();
 		Block north = block.getRelative(BlockFace.NORTH);
 		Block east = block.getRelative(BlockFace.EAST);
 		Block south = block.getRelative(BlockFace.SOUTH);
 		Block west = block.getRelative(BlockFace.WEST);
 		if (north.getType() == Material.BRICK || north.getType() == Material.NETHERRACK) {
-			
+			if (GetNode(north.getLocation()) != null)
+				return true;
+		}
+		if (east.getType() == Material.BRICK || east.getType() == Material.NETHERRACK) {
+			if (GetNode(east.getLocation()) != null)
+				return true;
+				}
+		if (south.getType() == Material.BRICK || south.getType() == Material.NETHERRACK) {
+			if (GetNode(south.getLocation()) != null)
+				return true;
+		}
+		if (west.getType() == Material.BRICK || west.getType() == Material.NETHERRACK) {
+			if (GetNode(west.getLocation()) != null)
+				return true;
 		}
 		return false;
 	}

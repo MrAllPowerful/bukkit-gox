@@ -16,6 +16,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.radiantai.gox.GoX;
 import com.radiantai.gox.chat.GoXChat;
+import com.radiantai.gox.pathfinding.GoXUtils;
 import com.radiantai.gox.structures.GoXPlayer;
 
 public class GoXAddStation implements Listener {
@@ -30,7 +31,7 @@ public class GoXAddStation implements Listener {
 	@EventHandler
 	public void onRailPlaced(BlockPlaceEvent e){
 		Block block = e.getBlock();
-		if (block.getType() != Material.RAILS) {
+		if (!GoXUtils.isRails(block)) {
 			return;
 		}
 		Block under = block.getRelative(BlockFace.DOWN);

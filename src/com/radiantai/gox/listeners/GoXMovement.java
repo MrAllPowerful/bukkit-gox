@@ -56,7 +56,7 @@ public class GoXMovement implements Listener {
 		
 		Location location = cart.getLocation();
 		Material blockUnderType = location.getBlock().getRelative(BlockFace.DOWN).getType();
-		GoXNode node = GoXMap.GetNode((int) Math.floor(location.getX()), (int) Math.floor(location.getZ()));
+		GoXNode node = GoXMap.GetNode(location);
 		
 		if (hasArrived(gp)) {
 			gp.reset();
@@ -124,7 +124,7 @@ public class GoXMovement implements Listener {
 		Block block = gp.getPlayer().getVehicle().getLocation().getBlock().getRelative(BlockFace.DOWN);
 		Location nodeLocation = block.getLocation();
 		
-		GoXNode node = GoXMap.GetNode((int) Math.floor(nodeLocation.getX()), (int) Math.floor(nodeLocation.getZ()));
+		GoXNode node = GoXMap.GetNode(nodeLocation);
 		String destination = gp.getDestination();
 		
 		if (destination != null) {

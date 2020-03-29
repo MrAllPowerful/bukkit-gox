@@ -16,6 +16,7 @@ import com.radiantai.gox.GoX;
 import com.radiantai.gox.chat.GoXChat;
 import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.pathfinding.GoXNode;
+import com.radiantai.gox.pathfinding.GoXUtils;
 
 public class GoXBreak implements Listener {
 	private GoX plugin;
@@ -33,7 +34,7 @@ public class GoXBreak implements Listener {
 			return;
 		}
 		Location location = block.getLocation();
-		GoXNode node = GoXMap.GetNode((int) location.getX(), (int) location.getZ());
+		GoXNode node = GoXMap.GetNode(location);
 		if (node != null && node.getY() == (int) location.getY()) {
 			e.getPlayer().sendMessage(ChatColor.RED+GoXChat.chat("cannot break"));
 			e.setCancelled(true);

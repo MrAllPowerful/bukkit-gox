@@ -20,6 +20,7 @@ import java.util.Queue;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,12 +49,12 @@ public class GoXMap {
 		nodes.add(node);
 	}
 	
-	public static void AddNode(int x, int y, int z) throws Exception {
-		GoXNode node = GoXMap.GetNode(x, z);
+	public static void AddNode(Location location) throws Exception {
+		GoXNode node = GoXMap.GetNode(location);
 		if (node != null) {
 			throw new Exception(GoXChat.chat("already location"));
 		}
-		nodes.add(new GoXNode(x, y, z));
+		nodes.add(new GoXNode(location));
 	}
 	
 	public static void AddStation(GoXStation station) {
@@ -62,9 +63,9 @@ public class GoXMap {
 		}
 	}
 	
-	public static void AddStation(String name, int x, int y, int z) throws Exception {
+	public static void AddStation(String name, Location location) throws Exception {
 		String idName = name.toLowerCase();
-		GoXNode node = GoXMap.GetNode(x, z);
+		GoXNode node = GoXMap.GetNode(location);
 		if (node != null) {
 			throw new Exception(GoXChat.chat("already location"));
 		}
@@ -78,7 +79,7 @@ public class GoXMap {
 		if (reserved.contains(idName)) {
 			throw new Exception(GoXChat.chat("name reserved"));
 		}
-		GoXStation newst = new GoXStation(name, x, y, z);
+		GoXStation newst = new GoXStation(name, location);
 		nodes.add(newst);
 		stations.put(idName, newst);
 	}
@@ -123,9 +124,12 @@ public class GoXMap {
 		}
 	}
 	
-	public static GoXNode GetNode(int x, int z) {
+	public static GoXNode GetNode(Location location) {
 		List<GoXNode> list = nodes.stream()
-		.filter(node -> (node.getX() == x && node.getZ() == z))
+		.filter(node -> (
+				node.getLocation().getBlockX() == location.getBlockX() &&
+				node.getLocation().getBlockZ() == location.getBlockZ() &&
+				node.getWorld().equals(location.getWorld().getName())))
 		.collect(Collectors.toList());
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -283,6 +287,8 @@ public class GoXMap {
 		    	  nodeWriter.newLine();
 		    	  nodeWriter.write(node instanceof GoXStation ? ((GoXStation) node).GetName() : "null");
 		    	  nodeWriter.newLine();
+		    	  nodeWriter.write(node.getWorld()+"");
+		    	  nodeWriter.newLine();
 		    	  nodeWriter.write(node.getX()+"");
 		    	  nodeWriter.newLine();
 		    	  nodeWriter.write(node.getY()+"");
@@ -328,6 +334,8 @@ public class GoXMap {
             	line = bufferedReader.readLine();
             	String stationName = line;
             	line = bufferedReader.readLine();
+            	String worldName = line;
+            	line = bufferedReader.readLine();
             	int x = Integer.parseInt(line);
             	line = bufferedReader.readLine();
             	int y = Integer.parseInt(line);
@@ -338,13 +346,15 @@ public class GoXMap {
             	bufferedReader.readLine();
             	bufferedReader.readLine();
             	
+            	Location location = new Location(Bukkit.getWorld(worldName),x,y,z);
+            	
             	if (!stationName.equals("null")) {
-            		GoXStation newStation = new GoXStation(id, x, y, z, null, null, null, null, stationName);
+            		GoXStation newStation = new GoXStation(id, location, null, null, null, null, stationName);
             		stations.put(stationName, newStation);
             		nodes.add(newStation);
             	}
             	else {
-            		GoXNode newNode = new GoXNode(id, x, y, z, null, null, null, null);
+            		GoXNode newNode = new GoXNode(id, location, null, null, null, null);
             		nodes.add(newNode);
             	}
             }   
@@ -361,9 +371,10 @@ public class GoXMap {
             	String id = line;
             	line = bufferedReader.readLine();
             	String stationName = line;
-            	line = bufferedReader.readLine();
-            	line = bufferedReader.readLine();
-            	line = bufferedReader.readLine();
+            	line = bufferedReader.readLine(); //worldName
+            	line = bufferedReader.readLine(); //x
+            	line = bufferedReader.readLine(); //y
+            	line = bufferedReader.readLine(); //z
             	line = bufferedReader.readLine();
             	String northId = line;
             	line = bufferedReader.readLine();

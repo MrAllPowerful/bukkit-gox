@@ -114,7 +114,7 @@ public class GoM implements CommandExecutor {
 			}
 			player.sendMessage(ChatColor.YELLOW + GoXChat.chat("adding node"));
 			try {
-				GoXMap.AddNode((int) location.getX(), (int) location.getY(), (int) location.getZ());
+				GoXMap.AddNode(location);
 			}
 			catch (Exception e) {
 				player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
@@ -147,7 +147,7 @@ public class GoM implements CommandExecutor {
 			}
 			player.sendMessage(ChatColor.YELLOW + "Adding a new station...");
 			try {
-				GoXMap.AddStation(name, (int) location.getX(), (int) location.getY(), (int) location.getZ());
+				GoXMap.AddStation(name, location);
 			}
 			catch (Exception e) {
 				player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
@@ -163,7 +163,7 @@ public class GoM implements CommandExecutor {
 	
 	private void executeRemove(Player player, String[] args) {
 		Location location = player.getLocation();
-		GoXNode node = GoXMap.GetNode((int) Math.floor(location.getX()), (int) Math.floor(location.getZ()));
+		GoXNode node = GoXMap.GetNode(location);
 		if (node != null) {
 			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("removing"));
 			try {
@@ -213,8 +213,8 @@ public class GoM implements CommandExecutor {
 		}
 		
 		Location location = player.getLocation();
-		GoXNode node = GoXMap.GetNode((int) Math.floor(location.getX()), (int) Math.floor(location.getZ()));
-		GoXNode to = GoXMap.GetNode(x, z);
+		GoXNode node = GoXMap.GetNode(location);
+		GoXNode to = GoXMap.GetNode(new Location(location.getWorld(),x,0,z));
 		if (to == null) {
 			player.sendMessage(ChatColor.RED+GoXChat.chat("no such node"));
 			return;
@@ -236,7 +236,7 @@ public class GoM implements CommandExecutor {
 	
 	private void executeInfo(Player player, String[] args) {
 		Location location = player.getLocation();
-		GoXNode node = GoXMap.GetNode((int) Math.floor(location.getX()), (int) Math.floor(location.getZ()));
+		GoXNode node = GoXMap.GetNode(location);
 		if (node != null) {
 			GoXChat.fancyNodeExtended(player, node);
 		}

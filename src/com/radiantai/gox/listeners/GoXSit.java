@@ -61,7 +61,7 @@ public class GoXSit implements Listener {
 			return;
 		}
 		
-		GoXNode node = GoXMap.GetNode((int) block.getX(), (int) block.getZ());
+		GoXNode node = GoXMap.GetNode(cart.getLocation());
 		if (node == null) {
 			return;
 		}

@@ -3,12 +3,11 @@ package com.radiantai.gox.pathfinding;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 
 public class GoXNode {
 	protected String id;
-	protected int x;
-	protected int y;
-	protected int z;
+	protected Location location;
 	protected GoXNode north;
 	protected GoXNode east;
 	protected GoXNode south;
@@ -17,18 +16,14 @@ public class GoXNode {
 	protected GoXNode prev;
 	protected String fromPrev;
 	
-	public GoXNode(int x, int y, int z) {
+	public GoXNode(Location location) {
 		id = GoXUtils.GenerateId(16);
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.location = GoXUtils.floorLocation(location);
 	}
 	
-	public GoXNode(String id, int x, int y, int z, GoXNode north, GoXNode east, GoXNode south, GoXNode west) {
+	public GoXNode(String id, Location location, GoXNode north, GoXNode east, GoXNode south, GoXNode west) {
 		this.id = id;
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.location = GoXUtils.floorLocation(location);
 		this.north = north;
 		this.east = east;
 		this.south = south;
@@ -39,7 +34,7 @@ public class GoXNode {
 	}
 
 	protected GoXNode clone() {
-		return new GoXNode(id, x, y, z, north, east, south, west);
+		return new GoXNode(id, location, north, east, south, west);
 	}
 
 	public String getId(){
@@ -47,15 +42,23 @@ public class GoXNode {
 	}
 	
 	public int getX() {
-		return x;
+		return location.getBlockX();
 	}
 	
 	public int getZ() {
-		return z;
+		return location.getBlockZ();
 	}
 	
 	public int getY() {
-		return y;
+		return location.getBlockY();
+	}
+	
+	public Location getLocation() {
+		return location;
+	}
+	
+	public String getWorld() {
+		return location.getWorld().getName();
 	}
 
 	public GoXNode getNorth(){
@@ -127,6 +130,6 @@ public class GoXNode {
 		String easts = east == null ? "" : east.getId();
 		String souths = south == null ? "" : south.getId();
 		String wests = west == null ? "" : west.getId();
-		return "Node> Id: "+id+" X: "+x+ " Y: " + y +" Z: "+z+" North: "+norths+" East: "+easts+" South: "+souths+" West: "+wests;
+		return "Node> Id: "+id+" X: "+location.getBlockX()+ " Y: " + location.getBlockY() +" Z: "+location.getBlockZ()+" North: "+norths+" East: "+easts+" South: "+souths+" West: "+wests;
 	}
 }

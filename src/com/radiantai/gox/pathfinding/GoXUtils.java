@@ -3,6 +3,7 @@ package com.radiantai.gox.pathfinding;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -166,5 +167,13 @@ public class GoXUtils {
 		gp.setNext(startDirection);
 		gp.setExpected(currentNode.getId());
 		return startDirection;
+	}
+	
+	public static Location floorLocation(Location location) {
+		Location newLoc = location.clone();
+		newLoc.setX(location.getBlockX());
+		newLoc.setY(location.getBlockY());
+		newLoc.setZ(location.getBlockZ());
+		return newLoc;
 	}
 }

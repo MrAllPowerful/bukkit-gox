@@ -211,4 +211,8 @@ public class GoXUtils {
             return "undefined";
         }
 	}
+	
+	public static int getBlockDistance(Location loc1, Location loc2) {
+		return Math.abs(loc1.getBlockX()-loc2.getBlockX()) + Math.abs(loc1.getBlockZ()-loc2.getBlockZ());
+	}
 }

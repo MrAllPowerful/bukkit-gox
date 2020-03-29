@@ -60,7 +60,7 @@ lang:
       invalid name: "Station name is invalid! Requirements: length: < 16, characters: letters, numbers, _."
       repath: "Oops! Did you miss a turn? Let us fix it..."
       cannot touch: "New node cannot touch any other existing nodes!"
-      invalid direction: "Valid directions: north, east, south, west!"
+      invalid direction: "Invalid direction: "
       no link: "This node has no links in specified direction!"
       unlink success: "Link removed!"
       force success: "Force direction set!"

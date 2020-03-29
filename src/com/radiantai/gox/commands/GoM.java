@@ -157,7 +157,7 @@ public class GoM implements CommandExecutor {
 		String dir = GoXUtils.getPlayerDirection(player);
 		
 		if (!GoXUtils.isValidDirection(dir)) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction"));
+			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction")+dir);
 			return;
 		}
 		
@@ -280,7 +280,7 @@ public class GoM implements CommandExecutor {
 		String dir = args[1].toLowerCase();
 		
 		if (!GoXUtils.isValidDirection(dir)) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction"));
+			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction")+dir);
 			return;
 		}
 		
@@ -348,8 +348,13 @@ public class GoM implements CommandExecutor {
 		String toId = args[3].toLowerCase();
 		String toDir = args[4].toLowerCase();
 		
-		if (!GoXUtils.isValidDirection(fromDir) || !GoXUtils.isValidDirection(toDir)) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction"));
+		if (!GoXUtils.isValidDirection(fromDir)) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction")+fromDir);
+			return;
+		}
+		
+		if (!GoXUtils.isValidDirection(toDir)) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction")+toDir);
 			return;
 		}
 		

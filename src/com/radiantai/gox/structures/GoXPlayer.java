@@ -1,6 +1,7 @@
 package com.radiantai.gox.structures;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
@@ -49,6 +50,28 @@ public class GoXPlayer {
 		}
 	}
 	
+	public void setAddstation(Location location) {
+		if (location==null) {
+			if (player.hasMetadata("go_add_station")) {
+				player.removeMetadata("go_add_station", plugin);
+			}
+		}
+		else {
+			player.setMetadata("go_add_station", new FixedMetadataValue(plugin, location));
+		}
+	}
+	
+	public void setAddNode(Location location) {
+		if (location==null) {
+			if (player.hasMetadata("go_add")) {
+				player.removeMetadata("go_add", plugin);
+			}
+		}
+		else {
+			player.setMetadata("go_add", new FixedMetadataValue(plugin, location));
+		}
+	}
+	
 	public void setExpected(String node) {
 		if (node==null) {
 			if (player.hasMetadata("go_exp")) {
@@ -80,6 +103,28 @@ public class GoXPlayer {
 		else {
 			player.setMetadata("go_path", new FixedMetadataValue(plugin, path));
 		}
+	}
+	
+	public Location getAddstation() {
+		Location result = null;
+		if (player.hasMetadata("go_add_station")) {
+			result = (Location) player.getMetadata("go_add_station").get(0).value();
+			if (result == null) {
+				player.removeMetadata("go_add_station", plugin);
+			}
+		}
+		return result;
+	}
+	
+	public Location getAddNode() {
+		Location result = null;
+		if (player.hasMetadata("go_add")) {
+			result = (Location) player.getMetadata("go_add").get(0).value();
+			if (result == null) {
+				player.removeMetadata("go_add", plugin);
+			}
+		}
+		return result;
 	}
 	
 	public String getNext() {

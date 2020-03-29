@@ -26,6 +26,7 @@ import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.pathfinding.GoXNode;
 import com.radiantai.gox.pathfinding.GoXPath;
 import com.radiantai.gox.pathfinding.GoXUtils;
+import com.radiantai.gox.structures.GoXPlayer;
 
 public class GoM implements CommandExecutor {
 	
@@ -101,7 +102,11 @@ public class GoM implements CommandExecutor {
 	
 	private void executeAdd(Player player, String[] args) {
 		if (player.hasMetadata("go_add")) {
-			Location location = (Location) player.getMetadata("go_add").get(0).value();
+			
+			GoXPlayer gp = new GoXPlayer(player, plugin);
+			Location location = gp.getAddNode();
+			gp.setAddNode(null);
+			
 			player.removeMetadata("go_add", plugin);
 			if (location.getBlock().getType() != Material.BRICK) {
 				player.sendMessage(ChatColor.RED + GoXChat.chat("place block"));
@@ -130,7 +135,11 @@ public class GoM implements CommandExecutor {
 				return;
 			}
 			String name = args[1];
-			Location location = (Location) player.getMetadata("go_add_station").get(0).value();
+			
+			GoXPlayer gp = new GoXPlayer(player, plugin);
+			Location location = gp.getAddstation();
+			gp.setAddstation(null);
+			
 			player.removeMetadata("go_add_station", plugin);
 			if (location.getBlock().getType() != Material.NETHERRACK) {
 				player.sendMessage(ChatColor.RED + GoXChat.chat("place station"));

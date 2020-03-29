@@ -21,6 +21,10 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -250,6 +254,18 @@ public class GoXMap {
 		}
 	}
 	
+	public boolean isNearby(Location location) {
+		Block block = location.getBlock();
+		Block north = block.getRelative(BlockFace.NORTH);
+		Block east = block.getRelative(BlockFace.EAST);
+		Block south = block.getRelative(BlockFace.SOUTH);
+		Block west = block.getRelative(BlockFace.WEST);
+		if (north.getType() == Material.BRICK || north.getType() == Material.NETHERRACK) {
+			
+		}
+		return false;
+	}
+	
 	public static void ToFile(String path, String name) {
 		try {
 			File file = new File(path);
@@ -346,11 +362,8 @@ public class GoXMap {
             	line = bufferedReader.readLine();
             	String stationName = line;
             	line = bufferedReader.readLine();
-            	int x = Integer.parseInt(line);
             	line = bufferedReader.readLine();
-            	int y = Integer.parseInt(line);
             	line = bufferedReader.readLine();
-            	int z = Integer.parseInt(line);
             	line = bufferedReader.readLine();
             	String northId = line;
             	line = bufferedReader.readLine();

@@ -9,8 +9,6 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import com.radiantai.gox.commands.GoM;
 import com.radiantai.gox.chat.GoXChat;
-import com.radiantai.gox.collisioncanceling.GoXCancelOnMove;
-import com.radiantai.gox.collisioncanceling.GoXCollision;
 import com.radiantai.gox.commands.Go;
 import com.radiantai.gox.listeners.GoXAddNode;
 import com.radiantai.gox.listeners.GoXAddStation;
@@ -59,8 +57,6 @@ public class GoX extends JavaPlugin {
 		pm.registerEvents(new GoXAddStation(this, bukkitLogger), this);
 		pm.registerEvents(new GoXBreak(this, bukkitLogger), this);
 		pm.registerEvents(new GoXSit(this, bukkitLogger), this);
-		//pm.registerEvents(new GoXCollision(this, bukkitLogger), this);
-		//pm.registerEvents(new GoXCancelOnMove(this, bukkitLogger), this);
 		pm.registerEvents(new GoXLeave(this, bukkitLogger), this);
 	}
 

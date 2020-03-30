@@ -69,6 +69,8 @@ lang:
       drop point success: "Drop point is set!"
       drop same world: "Drop point must be in same world as station!"
       drop distance: "Drop point must be no further than:"
+      distance: "Distance"
+      closest: "Closest stations"
 config:
    prohibited stations:
       - "cancel"

@@ -244,44 +244,34 @@ public class GoXMap {
 			if (curr.getId().equals(finish)) {
 				return constructPath(currNode);
 			}
-			if (curr.getForceDirection() == null) {
-				if (curr.getNorth() != null && !closeSet.contains(curr.getNorth().getId())) {
-					GoXNode node = curr.getNorth();
-					int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
-					int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
-					PathNode pathNode = new PathNode(node, currNode, "north", addedDistance, estimated);
-					openSet.add(pathNode);
-				}
-				if (curr.getEast() != null && !closeSet.contains(curr.getEast().getId())) {
-					GoXNode node = curr.getEast();
-					int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
-					int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
-					PathNode pathNode = new PathNode(node, currNode, "east", addedDistance, estimated);
-					openSet.add(pathNode);
-				}
-				if (curr.getSouth() != null && !closeSet.contains(curr.getSouth().getId())) {
-					GoXNode node = curr.getSouth();
-					int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
-					int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
-					PathNode pathNode = new PathNode(node, currNode, "south", addedDistance, estimated);
-					openSet.add(pathNode);
-				}
-				if (curr.getWest() != null && !closeSet.contains(curr.getWest().getId())) {
-					GoXNode node = curr.getWest();
-					int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
-					int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
-					PathNode pathNode = new PathNode(node, currNode, "west", addedDistance, estimated);
-					openSet.add(pathNode);
-				}
+			String forcedDirection = curr.getForceDirection() != null ? curr.getForceDirection() : "null";
+			if (curr.getNorth() != null && !closeSet.contains(curr.getNorth().getId()) && !forcedDirection.equals("south")) {
+				GoXNode node = curr.getNorth();
+				int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
+				int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+				PathNode pathNode = new PathNode(node, currNode, "north", addedDistance, estimated);
+				openSet.add(pathNode);
 			}
-			else { //force direction
-				GoXNode forcedTo = curr.getLink(curr.getForceDirection());
-				if (!closeSet.contains(forcedTo.getId())) {
-					int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), forcedTo.getLocation());
-					int estimated = addedDistance + GoXUtils.getBlockDistance(forcedTo.getLocation(), finishNode.getLocation());
-					PathNode pathNode = new PathNode(forcedTo, currNode, curr.getForceDirection(), addedDistance, estimated);
-					openSet.add(pathNode);
-				}
+			if (curr.getEast() != null && !closeSet.contains(curr.getEast().getId()) && !forcedDirection.equals("west")) {
+				GoXNode node = curr.getEast();
+				int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
+				int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+				PathNode pathNode = new PathNode(node, currNode, "east", addedDistance, estimated);
+				openSet.add(pathNode);
+			}
+			if (curr.getSouth() != null && !closeSet.contains(curr.getSouth().getId()) && !forcedDirection.equals("north")) {
+				GoXNode node = curr.getSouth();
+				int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
+				int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+				PathNode pathNode = new PathNode(node, currNode, "south", addedDistance, estimated);
+				openSet.add(pathNode);
+			}
+			if (curr.getWest() != null && !closeSet.contains(curr.getWest().getId()) && !forcedDirection.equals("east")) {
+				GoXNode node = curr.getWest();
+				int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
+				int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+				PathNode pathNode = new PathNode(node, currNode, "west", addedDistance, estimated);
+				openSet.add(pathNode);
 			}
 		}
 		return null;
@@ -343,6 +333,12 @@ public class GoXMap {
 				return true;
 		}
 		return false;
+	}
+	
+	public static List<GoXStation> getClosestStations(Location other) {
+		List<GoXStation> list = stations.values().stream().collect(Collectors.toList());
+		Collections.sort(list, GoXNode.distanceToLocationComparator(other));
+		return list;
 	}
 	
 	public static void ToFile(String path, String name) {
@@ -528,7 +524,7 @@ public class GoXMap {
             bufferedReader.close();
         }
         catch(FileNotFoundException e) {
-            logger.warning("Unable to open file with a map! Is it a first lauch?");
+            logger.warning("Unable to open file with a map! Is it the first lauch?");
         }
         catch(IOException e) {
             logger.warning("Error reading file '" + name + "' "+ e.getStackTrace());

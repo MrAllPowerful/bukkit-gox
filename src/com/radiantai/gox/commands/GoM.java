@@ -298,21 +298,40 @@ public class GoM implements CommandExecutor {
 			player.sendMessage(ChatColor.RED+GoXChat.chat("no link"));
 			return;
 		}
+		try {
+			node.setLink(dir, null);
+			linked.unlink(node.getId());
+		}
+		catch (Exception e) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
+			return;
+		}
 		
-		node.setLink(dir, null);
-		linked.unlink(node.getId());
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("unlink success"));
 	}
 	
 	private void executeLink(Player player, String[] args) {
-		if (args.length < 2) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <from-id> <direction> <to-id> <direction>");
+		if (args.length == 2) {
+			executeAutoLink(player, args);
 			return;
 		}
-		else if (args.length > 2) {
+		else if (args.length == 3) {
+			executeOnesidedLink(player, args);
+			return;
+		}
+		else if (args.length == 5) {
 			executeManualLink(player, args);
 			return;
 		}
+		else {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <id>");
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <direction> <id>");
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <from-id> <direction> <to-id> <direction>");
+			return;
+		}
+	}
+	
+	private void executeAutoLink(Player player, String[] args) {
 		
 		String id = args[1].toLowerCase();
 		
@@ -379,6 +398,40 @@ public class GoM implements CommandExecutor {
 			return;
 		}
 		
+		player.sendMessage(ChatColor.GREEN+GoXChat.chat("linking success"));
+	}
+	
+	private void executeOnesidedLink(Player player, String[] args) {
+		String id = args[2].toLowerCase();
+		String dir = args[1].toLowerCase();
+		
+		if (!GoXUtils.isValidDirection(dir)) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction")+dir);
+			return;
+		}
+		
+		Location location = player.getLocation();
+		GoXNode from = GoXMap.GetNode(location);
+		GoXNode to = GoXMap.GetNode(id);
+		
+		if (from == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("stand over"));
+			return;
+		}
+		
+		if (to == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("no such node"));
+			return;
+		}
+		
+		player.sendMessage(ChatColor.YELLOW+GoXChat.chat("linking"));
+		try {
+			from.setLink(dir, to);
+		}
+		catch (Exception e) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
+			return;
+		}
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("linking success"));
 	}
 	

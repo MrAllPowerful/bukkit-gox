@@ -1,9 +1,12 @@
 package com.radiantai.gox.pathfinding;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+
+import com.radiantai.gox.chat.GoXChat;
 
 public class GoXNode {
 	protected String id;
@@ -111,7 +114,10 @@ public class GoXNode {
 		return null;
 	}
 	
-	public void setLink(String dir, GoXNode node) {
+	public void setLink(String dir, GoXNode node) throws Exception {
+		if (id.equals(node.getId())) {
+			throw new Exception(GoXChat.chat("to itself"));
+		}
 		switch (dir) {
 			case "north":
 				north = node;
@@ -161,5 +167,24 @@ public class GoXNode {
 		String souths = south == null ? "" : south.getId();
 		String wests = west == null ? "" : west.getId();
 		return "Node> Id: "+id+" X: "+location.getBlockX()+ " Y: " + location.getBlockY() +" Z: "+location.getBlockZ()+" North: "+norths+" East: "+easts+" South: "+souths+" West: "+wests;
+	}
+	
+	public static Comparator<GoXNode> distanceToLocationComparator(Location other) {
+		return new Comparator<GoXNode>() {
+			@Override
+			public int compare(GoXNode node1, GoXNode node2) {
+				if (!other.getWorld().getName().equals(node1.getWorld()) || !other.getWorld().getName().equals(node2.getWorld())) {
+					return 0;
+				}
+				double distance1 = node1.getLocation().distance(other);
+				double distance2 = node2.getLocation().distance(other);
+				if (distance1 < distance2)
+					return -1;
+				else if (distance1 > distance2)
+					return 1;
+				else
+					return 0;
+			}
+		};
 	}
 }

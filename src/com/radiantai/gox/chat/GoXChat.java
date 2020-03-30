@@ -2,6 +2,7 @@ package com.radiantai.gox.chat;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,12 +35,25 @@ public class GoXChat {
 		return result;
 	}
 	
-	public static void fancyStationCompact(Player p, GoXNode station) {
+	public static void fancyStationCompact(Player p, GoXStation station) {
 		if (station == null || !(station instanceof GoXStation)) {
 			p.sendMessage(ChatColor.YELLOW+"<"+chat("empty")+">");
 			return;
 		}
 		p.sendMessage(ChatColor.GREEN+"  "+((GoXStation) station).GetName());
+	}
+	
+	public static void fancyStationWithDistance(Player p, GoXStation station) {
+		if (station == null) {
+			p.sendMessage(ChatColor.YELLOW+"<"+chat("empty")+">");
+			return;
+		}
+		int distance = (int) station.getLocation().distance(p.getLocation());
+		p.sendMessage(" "+ChatColor.YELLOW+chat("name")+":"+ChatColor.GREEN+" "+station.GetName()
+				+ChatColor.YELLOW+" "+chat("distance")+": "+ChatColor.GREEN+distance
+				+ChatColor.YELLOW+" "+chat("x")+" : "+ChatColor.GREEN+station.getX()
+				+ChatColor.YELLOW+" "+chat("y")+" : "+ChatColor.GREEN+station.getY()
+				+ChatColor.YELLOW+" "+chat("z")+" : "+ChatColor.GREEN+station.getZ());
 	}
 	
 	public static void fancyStation(Player p, GoXStation station) {
@@ -81,7 +95,7 @@ public class GoXChat {
 			p.sendMessage("   "+ChatColor.YELLOW+chat("z")+":"+ChatColor.GREEN+" "+station.getDropPoint().getZ());
 		}
 		else {
-			p.sendMessage("   "+ChatColor.YELLOW+chat("empty"));
+			p.sendMessage("   "+ChatColor.YELLOW+"<"+chat("empty")+">");
 		}
 	}
 	
@@ -128,6 +142,20 @@ public class GoXChat {
 			}
 			if (last==i) break;
 			i++;
+		}
+	}
+	
+	public static void closestList(Player p, int n) {
+		List<GoXStation> list = GoXMap.getClosestStations(p.getLocation());
+		p.sendMessage(ChatColor.DARK_GREEN+chat("closest")+":");
+		if (list==null || list.isEmpty()) {
+			p.sendMessage(ChatColor.YELLOW+"<"+chat("empty")+">");
+			return;
+		}
+		for (GoXStation station : list) {
+			fancyStationWithDistance(p, station);
+			n--;
+			if (n<=0) break;
 		}
 	}
 }

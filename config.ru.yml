@@ -47,7 +47,7 @@ lang:
     name reserved: "Вы не можете использовать это название!"
     arrived: "Вы прибыли!"
     already location: "Тут уже есть контрольный блок!"
-    already name: "Станция с таким название уже существует!"
+    already name: "Станция с таким названием уже существует!"
     no such station: "Станция не найдена!"
     cannot remove node: "Вы не можете удалить узел, который является станцией, используйте removestation!"
     to itself: "Вы не можете связать узел с самим собой!"
@@ -68,6 +68,8 @@ lang:
     drop point success: "Установлена точка высадки!"
     drop same world: "Точка высадки должна находиться в одном мире со станцией!"
     drop distance: "Точка высадки должна находиться не далее:"
+    distance: "Расстояние"
+    closest: "Ближайшие станции"
 config:
   prohibited stations:
   - cancel

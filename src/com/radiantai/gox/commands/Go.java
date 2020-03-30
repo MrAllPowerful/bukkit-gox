@@ -72,6 +72,9 @@ public class Go implements CommandExecutor {
 			case "list":
 				executeList(player, args);
 				break;
+			case "closest":
+				executeClosest(player, args);
+				break;
 			default:
 				executeGo(player, args);
 				break;
@@ -80,6 +83,10 @@ public class Go implements CommandExecutor {
 		else {
 			player.sendMessage(ChatColor.DARK_RED + GoXChat.chat("no access"));
 		}
+	}
+	
+	private void executeClosest(Player player, String[] args) {
+		GoXChat.closestList(player, 3);
 	}
 	
 	private void executeList(Player player, String[] args) {
@@ -142,7 +149,9 @@ public class Go implements CommandExecutor {
 		if (id != null) {
 			GoXNode destination = GoXMap.GetNode(id);
 			player.sendMessage(ChatColor.GREEN + GoXChat.chat("destination"));
-			GoXChat.fancyStationCompact(player, destination);
+			if (destination instanceof GoXStation) {
+				GoXChat.fancyStationCompact(player,(GoXStation) destination);
+			}
 		}
 		else {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("no destination"));

@@ -73,7 +73,9 @@ public class GoXMovement implements Listener {
 					player.getInventory().addItem(new ItemStack(Material.MINECART));
 				}
 			}
-			GoXChat.fancyStationCompact(player, node);
+			if (node instanceof GoXStation) {
+				GoXChat.fancyStationCompact(player,(GoXStation) node);
+			}
 			return;
 		}
 		

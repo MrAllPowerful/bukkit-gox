@@ -69,6 +69,7 @@ public class GoXSit implements Listener {
 		String startDirection = GoXUtils.repathRoutine(gp, node);
 		
 		if (startDirection != null) {
+			cart.setMaxSpeed(cart.getMaxSpeed()*1.5);
 			GoXUtils.turnRail(cart, startDirection);
 			GoXUtils.pushCart(cart, startDirection);
 		}

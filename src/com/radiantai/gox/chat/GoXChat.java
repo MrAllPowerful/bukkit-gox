@@ -14,13 +14,16 @@ import org.bukkit.entity.Player;
 import com.radiantai.gox.GoX;
 import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.pathfinding.GoXNode;
+import com.radiantai.gox.pathfinding.GoXPath;
 import com.radiantai.gox.pathfinding.GoXStation;
 
 public class GoXChat {
+	private static GoX goxplugin = null;
 	private static boolean cyrillicDecoder = false;
 	private static ConfigurationSection chatConfig;
 	
 	public static void setupChat(GoX plugin) {
+		goxplugin = plugin;
 		cyrillicDecoder = plugin.getConfig().getConfigurationSection("lang").getBoolean("cyrillic decoding");
 		chatConfig = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("commands");
 	}
@@ -157,5 +160,16 @@ public class GoXChat {
 			n--;
 			if (n<=0) break;
 		}
+	}
+	
+	public static void estimatedTime(Player p, GoXPath path) {
+		double estimated = path.getDistance()/7.5/goxplugin.getCartMaxSpeed();
+		int minutes = (int) Math.floor(estimated/60.0);
+		int seconds = (int) Math.ceil(estimated-minutes*60.0);
+		String message = ChatColor.GREEN + chat("estimated time")+": "+ChatColor.WHITE;
+		message += minutes==0 ? "" : minutes+" "+chat("minutes")+" ";
+		message += seconds==0 ? "" : seconds+" "+chat("seconds");
+		message += ".";
+		p.sendMessage(message);
 	}
 }

@@ -36,7 +36,7 @@ public class GoXAddNode implements Listener {
 		}
 		Block under = block.getRelative(BlockFace.DOWN);
 		Player player = e.getPlayer();
-		if (under.getType() == Material.BRICK) {
+		if (under.getType() == plugin.getNodeBlock()) {
 			new GoXPlayer(player, plugin).setAddNode(under.getLocation());
 			player.sendMessage(ChatColor.GREEN + GoXChat.chat("enter add node") + ChatColor.WHITE + "/gom add");
 		}

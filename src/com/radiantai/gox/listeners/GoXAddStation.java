@@ -36,7 +36,7 @@ public class GoXAddStation implements Listener {
 		}
 		Block under = block.getRelative(BlockFace.DOWN);
 		Player player = e.getPlayer();
-		if (under.getType() == Material.NETHERRACK) {
+		if (under.getType() == plugin.getStationBlock()) {
 			new GoXPlayer(player, plugin).setAddstation(under.getLocation());
 			player.sendMessage(
 					ChatColor.GREEN + GoXChat.chat("enter add station") + ChatColor.WHITE + "/gom addstation <station name>");

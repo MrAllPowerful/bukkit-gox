@@ -160,6 +160,17 @@ public class GoXNode {
 		}
 		return null;
 	}
+	
+	public int blockDistance(GoXNode other) {
+		Location loc1 = this.getLocation();
+		Location loc2 = other.getLocation();
+		return Math.abs(loc1.getBlockX()-loc2.getBlockX()) + Math.abs(loc1.getBlockZ()-loc2.getBlockZ());
+	}
+	
+	public int blockDistance(Location otherLocation) {
+		Location loc = this.getLocation();
+		return Math.abs(loc.getBlockX()-otherLocation.getBlockX()) + Math.abs(loc.getBlockZ()-otherLocation.getBlockZ());
+	}
 
 	public String toString() {
 		String norths = north == null ? "" : north.getId();

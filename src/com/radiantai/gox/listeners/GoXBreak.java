@@ -30,7 +30,7 @@ public class GoXBreak implements Listener {
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent e){
 		Block block = e.getBlock();
-		if (block.getType() != Material.BRICK && block.getType() != Material.NETHERRACK) {
+		if (block.getType() != plugin.getNodeBlock() && block.getType() != plugin.getStationBlock()) {
 			return;
 		}
 		Location location = block.getLocation();

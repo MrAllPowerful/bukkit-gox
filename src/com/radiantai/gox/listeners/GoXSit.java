@@ -45,6 +45,8 @@ public class GoXSit implements Listener {
 		Minecart cart = (Minecart) e.getVehicle();
 		Player player = (Player) e.getEntered();
 		
+		cart.setMaxSpeed(0.4*plugin.getCartMaxSpeed());
+		
 		GoXPlayer gp = new GoXPlayer(player, plugin);
 		String destination = gp.getDestination();
 		
@@ -56,8 +58,8 @@ public class GoXSit implements Listener {
 		if (!GoXUtils.isRails(block)) {
 			return;
 		}
-		if (!GoXUtils.isCartOverBlock(cart, Material.NETHERRACK) &&
-				!GoXUtils.isCartOverBlock(cart, Material.BRICK)) {
+		if (!GoXUtils.isCartOverBlock(cart, plugin.getStationBlock()) &&
+				!GoXUtils.isCartOverBlock(cart, plugin.getNodeBlock())) {
 			return;
 		}
 		
@@ -69,7 +71,6 @@ public class GoXSit implements Listener {
 		String startDirection = GoXUtils.repathRoutine(gp, node);
 		
 		if (startDirection != null) {
-			cart.setMaxSpeed(cart.getMaxSpeed()*1.5);
 			GoXUtils.turnRail(cart, startDirection);
 			GoXUtils.pushCart(cart, startDirection);
 		}

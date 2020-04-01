@@ -71,7 +71,13 @@ lang:
       drop distance: "Drop point must be no further than:"
       distance: "Distance"
       closest: "Closest stations"
+      estimated time: "Estimated time to arrive"
+      minutes: "minutes"
+      seconds: "seconds"
 config:
+   node block: 45
+   station block: 87
+   cart velocity multiplier: 1.1
    prohibited stations:
       - "cancel"
       - "current"

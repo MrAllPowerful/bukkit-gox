@@ -5,9 +5,11 @@ import java.util.Stack;
 
 public class GoXPath {
 	private Stack<String> path;
+	private int distance;
 	
 	public GoXPath() {
 		path = new Stack<String>();
+		distance = 0;
 	}
 	
 	public void Push(String s) {
@@ -29,4 +31,17 @@ public class GoXPath {
 	public String toString() {
 		return path.toString();
 	}
+	
+	public void addDistance(int distance) {
+		this.distance += distance;
+	}
+
+	public int getDistance() {
+		return distance;
+	}
+
+	public void setDistance(int distance) {
+		this.distance = distance;
+	}
+	
 }

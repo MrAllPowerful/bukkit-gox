@@ -183,7 +183,7 @@ public class GoM implements CommandExecutor {
 			gp.setAddNode(null);
 			
 			player.removeMetadata("go_add", plugin);
-			if (location.getBlock().getType() != Material.BRICK) {
+			if (location.getBlock().getType() != plugin.getNodeBlock()) {
 				player.sendMessage(ChatColor.RED + GoXChat.chat("place block"));
 				return;
 			}
@@ -216,7 +216,7 @@ public class GoM implements CommandExecutor {
 			gp.setAddstation(null);
 			
 			player.removeMetadata("go_add_station", plugin);
-			if (location.getBlock().getType() != Material.NETHERRACK) {
+			if (location.getBlock().getType() != plugin.getStationBlock()) {
 				player.sendMessage(ChatColor.RED + GoXChat.chat("place station"));
 				return;
 			}

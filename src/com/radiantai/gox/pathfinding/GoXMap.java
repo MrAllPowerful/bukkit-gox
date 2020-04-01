@@ -234,7 +234,7 @@ public class GoXMap {
 		PathNode first = new PathNode(GetNode(start));
 		GoXNode finishNode = GetNode(finish);
 		first.setDistance(0);
-		first.setEstimated(GoXUtils.getBlockDistance(first.getCurrent().getLocation(), finishNode.getLocation()));
+		first.setEstimated(first.getCurrent().blockDistance(finishNode));
 		openSet.add(first);
 		while (!openSet.isEmpty()) {
 			PathNode currNode = openSet.poll();
@@ -247,29 +247,29 @@ public class GoXMap {
 			String forcedDirection = curr.getForceDirection() != null ? curr.getForceDirection() : "null";
 			if (curr.getNorth() != null && !closeSet.contains(curr.getNorth().getId()) && !forcedDirection.equals("south")) {
 				GoXNode node = curr.getNorth();
-				int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
-				int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+				int addedDistance = distance + curr.blockDistance(node);
+				int estimated = addedDistance + node.blockDistance(finishNode);
 				PathNode pathNode = new PathNode(node, currNode, "north", addedDistance, estimated);
 				openSet.add(pathNode);
 			}
 			if (curr.getEast() != null && !closeSet.contains(curr.getEast().getId()) && !forcedDirection.equals("west")) {
 				GoXNode node = curr.getEast();
-				int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
-				int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+				int addedDistance = distance + curr.blockDistance(node);
+				int estimated = addedDistance + node.blockDistance(finishNode);
 				PathNode pathNode = new PathNode(node, currNode, "east", addedDistance, estimated);
 				openSet.add(pathNode);
 			}
 			if (curr.getSouth() != null && !closeSet.contains(curr.getSouth().getId()) && !forcedDirection.equals("north")) {
 				GoXNode node = curr.getSouth();
-				int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
-				int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+				int addedDistance = distance + curr.blockDistance(node);
+				int estimated = addedDistance + node.blockDistance(finishNode);
 				PathNode pathNode = new PathNode(node, currNode, "south", addedDistance, estimated);
 				openSet.add(pathNode);
 			}
 			if (curr.getWest() != null && !closeSet.contains(curr.getWest().getId()) && !forcedDirection.equals("east")) {
 				GoXNode node = curr.getWest();
-				int addedDistance = distance + GoXUtils.getBlockDistance(curr.getLocation(), node.getLocation());
-				int estimated = addedDistance + GoXUtils.getBlockDistance(node.getLocation(), finishNode.getLocation());
+				int addedDistance = distance + curr.blockDistance(node);
+				int estimated = addedDistance + node.blockDistance(finishNode);
 				PathNode pathNode = new PathNode(node, currNode, "west", addedDistance, estimated);
 				openSet.add(pathNode);
 			}
@@ -280,7 +280,10 @@ public class GoXMap {
 	private static GoXPath constructPath(PathNode curr) {
 		GoXPath path = new GoXPath();
 		while (curr.getPrev() != null) {
+			PathNode prev = curr.getPrev();
+			int distance = curr.getCurrent().blockDistance(prev.getCurrent());
 			path.Push(curr.getFromPrev());
+			path.addDistance(distance);
 			curr = curr.getPrev();
 		}
 		return path;
@@ -316,19 +319,19 @@ public class GoXMap {
 		Block east = block.getRelative(BlockFace.EAST);
 		Block south = block.getRelative(BlockFace.SOUTH);
 		Block west = block.getRelative(BlockFace.WEST);
-		if (north.getType() == Material.BRICK || north.getType() == Material.NETHERRACK) {
+		if (north.getType() == plugin.getNodeBlock() || north.getType() == plugin.getStationBlock()) {
 			if (GetNode(north.getLocation()) != null)
 				return true;
 		}
-		if (east.getType() == Material.BRICK || east.getType() == Material.NETHERRACK) {
+		if (east.getType() == plugin.getNodeBlock() || east.getType() == plugin.getStationBlock()) {
 			if (GetNode(east.getLocation()) != null)
 				return true;
 				}
-		if (south.getType() == Material.BRICK || south.getType() == Material.NETHERRACK) {
+		if (south.getType() == plugin.getNodeBlock() || south.getType() == plugin.getStationBlock()) {
 			if (GetNode(south.getLocation()) != null)
 				return true;
 		}
-		if (west.getType() == Material.BRICK || west.getType() == Material.NETHERRACK) {
+		if (west.getType() == plugin.getNodeBlock() || west.getType() == plugin.getStationBlock()) {
 			if (GetNode(west.getLocation()) != null)
 				return true;
 		}

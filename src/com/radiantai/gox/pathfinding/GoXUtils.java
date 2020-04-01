@@ -172,6 +172,7 @@ public class GoXUtils {
 		}
 		
 		gp.getPlayer().sendMessage(ChatColor.GREEN+GoXChat.chat("path found"));
+		GoXChat.estimatedTime(gp.getPlayer(), path);
 		
 		String startDirection = path.Pop();
 		gp.setPath(path);
@@ -214,9 +215,5 @@ public class GoXUtils {
         } else {
             return "undefined";
         }
-	}
-	
-	public static int getBlockDistance(Location loc1, Location loc2) {
-		return Math.abs(loc1.getBlockX()-loc2.getBlockX()) + Math.abs(loc1.getBlockZ()-loc2.getBlockZ());
 	}
 }

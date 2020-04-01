@@ -2,6 +2,7 @@ package com.radiantai.gox;
 
 import java.util.logging.Logger;
 
+import org.bukkit.Material;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,6 +26,9 @@ public class GoX extends JavaPlugin {
 	private Logger bukkitLogger;
 	private String mapFilePath;
 	private String mapFileName;
+	private Material nodeBlock;
+	private Material stationBlock;
+	private double cartMaxSpeed;
 	
 	public void onEnable() {
 		pdf = getDescription();
@@ -68,11 +72,23 @@ public class GoX extends JavaPlugin {
 	public void loadConfig() {
 		getConfig().options().copyDefaults(true);
 		saveConfig();
+		cartMaxSpeed = getConfig().getConfigurationSection("config").getDouble("cart velocity multiplier");
+		nodeBlock = Material.values()[getConfig().getConfigurationSection("config").getInt("node block")];
+		stationBlock = Material.values()[getConfig().getConfigurationSection("config").getInt("station block")];
 	}
 	
 	public void scheduleBackup() {
 		BukkitScheduler scheduler = getServer().getScheduler();
 		long backupWait = getConfig().getConfigurationSection("backup").getLong("ticks between backups");
         scheduler.runTaskTimerAsynchronously(this, new GoXMapBackup(this, bukkitLogger, mapFilePath, mapFileName), 300L, backupWait);
+	}
+	public Material getNodeBlock() {
+		return nodeBlock;
+	}
+	public Material getStationBlock() {
+		return stationBlock;
+	}
+	public double getCartMaxSpeed() {
+		return cartMaxSpeed;
 	}
 }

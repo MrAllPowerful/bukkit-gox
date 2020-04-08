@@ -71,8 +71,8 @@ lang:
     distance: "Расстояние"
     closest: "Ближайшие станции"
     estimated time: "До прибытия приблизительно"
-    minutes: "минут(ы)"
-    seconds: "секунд(ы)"
+    minutes: "минут"
+    seconds: "секунд"
 config:
   node block: 45
   station block: 87

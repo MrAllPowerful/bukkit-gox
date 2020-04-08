@@ -115,7 +115,7 @@ public class GoXNode {
 	}
 	
 	public void setLink(String dir, GoXNode node) throws Exception {
-		if (id.equals(node.getId())) {
+		if (node != null && id.equals(node.getId())) {
 			throw new Exception(GoXChat.chat("to itself"));
 		}
 		switch (dir) {

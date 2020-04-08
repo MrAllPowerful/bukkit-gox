@@ -300,7 +300,6 @@ public class GoM implements CommandExecutor {
 		}
 		try {
 			node.setLink(dir, null);
-			linked.unlink(node.getId());
 		}
 		catch (Exception e) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());

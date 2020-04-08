@@ -45,7 +45,7 @@ lang:
     name: "Название"
     no such command: "Нет такой подкоманды для: "
     name reserved: "Вы не можете использовать это название!"
-    arrived: "Вы прибыли!"
+    arrived: "Вы прибыли на"
     already location: "Тут уже есть контрольный блок!"
     already name: "Станция с таким названием уже существует!"
     no such station: "Станция не найдена!"
@@ -73,6 +73,8 @@ lang:
     estimated time: "До прибытия приблизительно"
     minutes: "минут"
     seconds: "секунд"
+    references: "Входящие соединения"
+    rename success: "Переименованно!"
 config:
   node block: 45
   station block: 87

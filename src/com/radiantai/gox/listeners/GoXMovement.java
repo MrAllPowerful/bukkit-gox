@@ -62,7 +62,7 @@ public class GoXMovement implements Listener {
 		
 		if (hasArrived(gp)) {
 			gp.reset();
-			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("arrived"));
+			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("arrived")+":");
 			GoXUtils.stopCart(cart);
 			if (node instanceof GoXStation) {
 				Location drop = ((GoXStation) node).getDropPoint();

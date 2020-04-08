@@ -45,7 +45,7 @@ lang:
       name: "Name"
       no such command: "There is no such command for: "
       name reserved: "You cannot use this name!"
-      arrived: "You arrived:"
+      arrived: "You arrived at"
       already location: "There is already a node/station at that location!"
       already name: "There is already a station with the same name!"
       no such station: "There is no such station!"
@@ -74,6 +74,8 @@ lang:
       estimated time: "Estimated time to arrive"
       minutes: "minutes"
       seconds: "seconds"
+      references: "Incoming links"
+      rename success: "Renamed successfully!"
 config:
    node block: 45
    station block: 87

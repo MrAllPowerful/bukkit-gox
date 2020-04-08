@@ -94,6 +94,35 @@ public class GoXMap {
 		stations.put(idName, newst);
 	}
 	
+	public static void renameStation(String oldName, String newName) throws Exception {
+		String oldLowerName = oldName.toLowerCase();
+		String newLowername = newName.toLowerCase();
+		
+		GoXStation st = stations.get(oldLowerName);
+		
+		if (st == null) {
+			throw new Exception(GoXChat.chat("no such station"));
+		}
+		if (!GoXUtils.validateName(newLowername)) {
+			throw new Exception(GoXChat.chat("invalid name"));
+		}
+		
+		GoXStation otherSt = stations.get(newLowername);
+		
+		if (otherSt != null && !otherSt.getId().equals(st.getId())) {
+			throw new Exception(GoXChat.chat("already name"));
+		}
+		
+		List<String> reserved = config.getStringList("prohibited stations");
+		if (reserved.contains(newLowername)) {
+			throw new Exception(GoXChat.chat("name reserved"));
+		}
+		
+		stations.remove(oldName);
+		st.SetName(newName);
+		stations.put(newName, st);
+	}
+	
 	public static void RemoveStation(String name) throws Exception {
 		if (stations != null) {
 			GoXStation st = stations.get(name.toLowerCase());
@@ -119,18 +148,7 @@ public class GoXMap {
 			if (!nodes.removeIf(n -> (n.getId() == id))) {
 				throw new Exception(GoXChat.chat("no such node"));
 			}
-			if (node.north != null) {
-				node.north.unlink(id);
-			}
-			if (node.south != null) {
-				node.south.unlink(id);
-			}
-			if (node.east != null) {
-				node.east.unlink(id);
-			}
-			if (node.west != null) {
-				node.west.unlink(id);
-			}
+			removeAllReferencedLinks(node);
 		}
 	}
 	
@@ -162,34 +180,22 @@ public class GoXMap {
 		return st;
 	}
 	
-	
-	public static void LinkNodes(GoXNode from, GoXNode to) throws Exception {
-		if (from.getId().equals(to.getId())) {
-			throw new Exception(GoXChat.chat("to itself"));
+	public static void removeAllReferencedLinks(GoXNode node) {
+		if (node==null) {
+			return;
 		}
-		if (from.getZ()==to.getZ()) {
-			if (from.getX() > to.getX()) {
-				from.SetWest(to);
-				to.SetEast(from);
-			}
-			else {
-				from.SetEast(to);
-				to.SetWest(from);
-			}
+		List<GoXNode> links = node.getReferences();
+		if (links == null || links.isEmpty()) {
+			return;
 		}
-		else if (from.getX()==to.getX()) {
-			if (from.getZ() > to.getZ()) {
-				from.SetNorth(to);
-				to.SetSouth(from);
-			}
-			else {
-				from.SetSouth(to);
-				to.SetNorth(from);
-			}
+		for (GoXNode link : links) {
+			link.unlinkById(node.getId());
 		}
-		else {
-			throw new Exception(GoXChat.chat("one line"));
-		}
+		node.clearReferences();
+		node.unlink("north");
+		node.unlink("east");
+		node.unlink("south");
+		node.unlink("west");
 	}
 	
 	public static void LinkNodesManual(GoXNode from, String fromDir, GoXNode to, String toDir) throws Exception {
@@ -202,6 +208,9 @@ public class GoXMap {
 		
 		from.setLink(fromDir, to);
 		to.setLink(toDir, from);
+		
+		from.addReference(to);
+		to.addReference(from);
 	}
 	
 	public static void MessageNodes(Player player) {
@@ -394,6 +403,9 @@ public class GoXMap {
 		    		  nodeWriter.write("null");
 		    	  }
 		    	  nodeWriter.newLine();
+		    	  
+		    	  nodeWriter.newLine(); // reserved line
+		    	  nodeWriter.newLine(); // reserved line
 			}
 		      	nodeWriter.close();
 		      	logger.info("Successfully wrote to the file.");
@@ -449,6 +461,9 @@ public class GoXMap {
                 	locationD = new Location(Bukkit.getWorld(worldName),xd,yd,zd,yaw,pitch);
             	}
             	
+            	bufferedReader.readLine(); // reserved line
+            	bufferedReader.readLine(); // reserved line
+            	
             	Location location = new Location(Bukkit.getWorld(worldName),x,y,z);
             	
             	if (!stationName.equals("null")) {
@@ -489,39 +504,27 @@ public class GoXMap {
             	GoXNode target = GetNode(id);
             	if (!northId.equals("null")) {
             		GoXNode north = GetNode(northId);
-            		target.SetNorth(north);
+            		target.setNorth(north);
+            		north.addReference(target);
             	}
             	if (!eastId.equals("null")) {
             		GoXNode east = GetNode(eastId);
-            		target.SetEast(east);
+            		target.setEast(east);
+            		east.addReference(target);
             	}
             	if (!southId.equals("null")) {
             		GoXNode south = GetNode(southId);
-            		target.SetSouth(south);
+            		target.setSouth(south);
+            		south.addReference(target);
             	}
             	if (!westId.equals("null")) {
             		GoXNode west = GetNode(westId);
-            		target.SetWest(west);
+            		target.setWest(west);
+            		west.addReference(target);
             	}
-            	if (!stationName.equals("null")) {
-            		GoXStation targetStation = stations.get(stationName);
-            		if (!northId.equals("null")) {
-                		GoXNode north = GetNode(northId);
-                		targetStation.SetNorth(north);
-                	}
-                	if (!eastId.equals("null")) {
-                		GoXNode east = GetNode(eastId);
-                		targetStation.SetEast(east);
-                	}
-                	if (!southId.equals("null")) {
-                		GoXNode south = GetNode(southId);
-                		targetStation.SetSouth(south);
-                	}
-                	if (!westId.equals("null")) {
-                		GoXNode west = GetNode(westId);
-                		targetStation.SetWest(west);
-                	}
-            	}
+            	
+            	bufferedReader.readLine(); // reserved line
+            	bufferedReader.readLine(); // reserved line
             }
             
             bufferedReader.close();

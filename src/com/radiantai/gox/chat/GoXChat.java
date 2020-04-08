@@ -91,6 +91,8 @@ public class GoXChat {
 		p.sendMessage("   "+ChatColor.YELLOW+chat("south")+":"+ChatColor.GREEN+" "+(station.getSouth() != null ? station.getSouth().getId() : "-"));
 		p.sendMessage("   "+ChatColor.YELLOW+chat("west")+":"+ChatColor.GREEN+" "+(station.getWest() != null ? station.getWest().getId() : "-"));
 		p.sendMessage("   "+ChatColor.YELLOW+chat("force")+":"+ChatColor.GREEN+" "+(station.getForceDirection() != null ? station.getForceDirection() : "-"));
+		String references = referencesToString(station.getReferences());
+		p.sendMessage("   "+ChatColor.YELLOW+chat("references")+":"+" "+references);
 		p.sendMessage(" "+ChatColor.GRAY+chat("drop point")+":");
 		if (station.getDropPoint() != null) {
 			p.sendMessage("   "+ChatColor.YELLOW+chat("x")+":"+ChatColor.GREEN+" "+station.getDropPoint().getX());
@@ -123,6 +125,8 @@ public class GoXChat {
 		p.sendMessage("   "+ChatColor.YELLOW+chat("south")+":"+ChatColor.GREEN+" "+(node.getSouth() != null ? node.getSouth().getId() : "-"));
 		p.sendMessage("   "+ChatColor.YELLOW+chat("west")+":"+ChatColor.GREEN+" "+(node.getWest() != null ? node.getWest().getId() : "-"));
 		p.sendMessage("   "+ChatColor.YELLOW+chat("force")+":"+ChatColor.GREEN+" "+(node.getForceDirection() != null ? node.getForceDirection() : "-"));
+		String references = referencesToString(node.getReferences());
+		p.sendMessage("   "+ChatColor.YELLOW+chat("references")+":"+" "+references);
 	}
 	
 	public static void stationList(Player p, int page, int max) {
@@ -171,5 +175,14 @@ public class GoXChat {
 		message += seconds==0 ? "" : seconds+" "+chat("seconds");
 		message += ".";
 		p.sendMessage(message);
+	}
+	
+	private static String referencesToString(List<GoXNode> references) {
+		String result = "";
+		for (GoXNode ref : references) {
+			ChatColor color = ref instanceof GoXStation ? ChatColor.BLUE : ChatColor.GREEN;
+			result += color + ref.getId() + " ";
+		}
+		return result;
 	}
 }

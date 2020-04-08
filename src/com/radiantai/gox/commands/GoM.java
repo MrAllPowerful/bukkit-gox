@@ -104,6 +104,9 @@ public class GoM implements CommandExecutor {
 			case "setdrop":
 				executeSetdrop(player, args);
 				break;
+			case "rename":
+				executeRename(player, args);
+				break;
 			default:
 				player.sendMessage(ChatColor.RED + GoXChat.chat("no such command") + ChatColor.WHITE + "/gom");
 			}
@@ -113,6 +116,25 @@ public class GoM implements CommandExecutor {
 		}
 	}
 	
+	private void executeRename(Player player, String[] args) {
+		if (args.length < 3) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom rename <old-name> <new-name>");
+			return;
+		}
+		String oldName = args[1];
+		String newName = args[2];
+		
+		try {
+			GoXMap.renameStation(oldName, newName);
+		}
+		catch (Exception e) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
+			return;
+		}
+		
+		player.sendMessage(ChatColor.GREEN+GoXChat.chat("rename success"));
+	}
+
 	private void executeSetdrop(Player player, String[] args) {
 		if (args.length < 2) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom setdrop <name>");
@@ -299,7 +321,7 @@ public class GoM implements CommandExecutor {
 			return;
 		}
 		try {
-			node.setLink(dir, null);
+			node.unlink(dir);
 		}
 		catch (Exception e) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
@@ -347,7 +369,7 @@ public class GoM implements CommandExecutor {
 		}
 		player.sendMessage(ChatColor.YELLOW+GoXChat.chat("linking"));
 		try {
-			GoXMap.LinkNodes(from, to);
+			from.autoLink(to);
 		}
 		catch (Exception e) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());

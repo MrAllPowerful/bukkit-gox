@@ -1,10 +1,11 @@
 package com.radiantai.gox.structures;
 
+import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -23,21 +24,16 @@ public class GoXCart {
 	public Minecart getCart() {
 		return cart;
 	}
-
-	public boolean hasPassenger() {
-		Entity passenger = cart.getPassengers().get(0);
-		if (passenger == null || !(passenger instanceof LivingEntity)) {
-			return false;
-		}
-		return true;
-	}
 	
-	public boolean hasPlayer() {
-		Entity passenger = cart.getPassengers().get(0);
-		if (passenger == null || !(passenger instanceof Player)) {
-			return false;
+	public Player getPlayer() {
+		List<Entity> passengers = cart.getPassengers();
+		if (passengers == null || passengers.isEmpty()) {
+			return null;
 		}
-		return true;
+		Player player = (Player) passengers.stream().filter(p -> p instanceof Player)
+		  .findAny()
+		  .orElse(null);
+		return player;
 	}
 	
 	public boolean isOnRails() {

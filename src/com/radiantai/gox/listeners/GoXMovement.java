@@ -38,9 +38,9 @@ public class GoXMovement implements Listener {
 		}
 		
 		Minecart cart = (Minecart)e.getVehicle();
-		Player player = (Player) cart.getPassengers().get(0);
-		GoXPlayer gp = new GoXPlayer(player, plugin);
 		GoXCart gc = new GoXCart(cart, plugin);
+		Player player = gc.getPlayer();
+		GoXPlayer gp = new GoXPlayer(player, plugin);
 		
 		if (gp.getDestination() == null) {
 			return;
@@ -115,7 +115,7 @@ public class GoXMovement implements Listener {
 		}
 		Minecart cart = (Minecart)e.getVehicle();
 		GoXCart gc = new GoXCart(cart, plugin);
-		if (!gc.isOnRails() || !gc.hasPlayer()) {
+		if (!gc.isOnRails() || gc.getPlayer() == null) {
 			return false;
 		}
 		return true;

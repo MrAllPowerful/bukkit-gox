@@ -27,7 +27,7 @@ public class GoXLeave implements Listener {
 		Minecart cart = (Minecart)e.getVehicle();
 		GoXCart gc = new GoXCart(cart, plugin);
 		
-		if (!gc.hasPlayer()) {
+		if (gc.getPlayer() == null) {
 			return;
 		}
 		

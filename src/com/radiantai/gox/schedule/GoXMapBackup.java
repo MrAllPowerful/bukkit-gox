@@ -2,18 +2,15 @@ package com.radiantai.gox.schedule;
 
 import java.util.logging.Logger;
 
-import com.radiantai.gox.GoX;
 import com.radiantai.gox.pathfinding.GoXMap;
 
 public class GoXMapBackup implements Runnable {
 	
-	private GoX plugin;
 	private String fileName;
 	private String filePath;
 	private Logger logger;
 
-    public GoXMapBackup(GoX plugin, Logger logger, String filePath, String fileName) {
-        this.plugin = plugin;
+    public GoXMapBackup(Logger logger, String filePath, String fileName) {
         this.fileName = fileName;
         this.filePath = filePath;
         this.logger = logger;

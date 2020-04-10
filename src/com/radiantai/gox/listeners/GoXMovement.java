@@ -1,44 +1,33 @@
 package com.radiantai.gox.listeners;
 
-import java.util.logging.Logger;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Rails;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
 import com.radiantai.gox.chat.GoXChat;
+import com.radiantai.gox.pathfinding.GoXDirection;
 import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.pathfinding.GoXNode;
-import com.radiantai.gox.pathfinding.GoXPath;
 import com.radiantai.gox.pathfinding.GoXStation;
 import com.radiantai.gox.pathfinding.GoXUtils;
+import com.radiantai.gox.structures.GoXCart;
 import com.radiantai.gox.structures.GoXPlayer;
-import com.radiantai.gox.structures.RollingQueue;
 
 public class GoXMovement implements Listener {
 	
 	private GoX plugin;
-	private Logger logger;
 	
-	public GoXMovement(GoX plugin, Logger logger) {
+	public GoXMovement(GoX plugin) {
 		this.plugin = plugin;
-		this.logger = logger;
 	}
 	
 	@EventHandler
@@ -51,19 +40,18 @@ public class GoXMovement implements Listener {
 		Minecart cart = (Minecart)e.getVehicle();
 		Player player = (Player) cart.getPassenger();
 		GoXPlayer gp = new GoXPlayer(player, plugin);
+		GoXCart gc = new GoXCart(cart, plugin);
 		
 		if (gp.getDestination() == null) {
 			return;
 		}
 		
-		Location location = cart.getLocation();
-		Material blockUnderType = location.getBlock().getRelative(BlockFace.DOWN).getType();
-		GoXNode node = GoXMap.GetNode(location);
+		GoXNode node = GoXMap.GetNode(cart.getLocation());
 		
 		if (hasArrived(gp)) {
 			gp.reset();
 			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("arrived")+":");
-			GoXUtils.stopCart(cart);
+			gc.stopCart();
 			if (node instanceof GoXStation) {
 				Location drop = ((GoXStation) node).getDropPoint();
 				if (drop != null) {
@@ -79,25 +67,24 @@ public class GoXMovement implements Listener {
 			return;
 		}
 		
-		switch(blockUnderType){
-		case BRICK:
-		case NETHERRACK:
+		if (gc.isCartOverBlock(plugin.getStationBlock()) ||
+				gc.isCartOverBlock(plugin.getNodeBlock())) {
 			
 			if (node == null) {
 				return;
 			}
 			
-			String nextDir = gp.getNext();
+			GoXDirection nextDir = gp.getNext();
 			
 			if(needRepath(gp, node)) {
-				GoXUtils.stopCart(cart);
+				gc.stopCart();
 				gp.resetPath();
 				
-				String startDirection = GoXUtils.repathRoutine(gp, node);
+				GoXDirection startDirection = GoXUtils.repathRoutine(gp, node);
 				
 				if (startDirection != null) {
-					GoXUtils.turnRail(cart, startDirection);
-					GoXUtils.pushCart(cart, startDirection);
+					gc.turnRail(startDirection);
+					gc.pushCart(startDirection);
 				}
 				return;
 			}
@@ -106,15 +93,14 @@ public class GoXMovement implements Listener {
 				return;
 			}
 			
-			GoXUtils.turnRail(cart, nextDir);
-			GoXUtils.setMinecartDirection(cart, nextDir);
+			gc.turnRail(nextDir);
+			gc.setMinecartDirection(nextDir);
 			
 			gp.setNext(null);
 			gp.setExpected(node.getLink(nextDir) != null ? node.getLink(nextDir).getId() : null);
-			
-			break;
-		default:
-			String dirOther = gp.getNext();
+		}	
+		else {
+			GoXDirection dirOther = gp.getNext();
 			if (dirOther == null) {
 				gp.setNext(gp.popPath());
 				return;
@@ -128,7 +114,8 @@ public class GoXMovement implements Listener {
 			return false;
 		}
 		Minecart cart = (Minecart)e.getVehicle();
-		if (!GoXUtils.isOnRails(cart) || !GoXUtils.hasPlayer(cart)) {
+		GoXCart gc = new GoXCart(cart, plugin);
+		if (!gc.isOnRails() || !gc.hasPlayer()) {
 			return false;
 		}
 		return true;

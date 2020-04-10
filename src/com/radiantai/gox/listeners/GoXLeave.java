@@ -1,7 +1,5 @@
 package com.radiantai.gox.listeners;
 
-import java.util.logging.Logger;
-
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,17 +7,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 
 import com.radiantai.gox.GoX;
-import com.radiantai.gox.pathfinding.GoXUtils;
+import com.radiantai.gox.structures.GoXCart;
 import com.radiantai.gox.structures.GoXPlayer;
 
 public class GoXLeave implements Listener {
 	
 	private GoX plugin;
-	private Logger logger;
 	
-	public GoXLeave(GoX plugin, Logger logger) {
+	public GoXLeave(GoX plugin) {
 		this.plugin = plugin;
-		this.logger = logger;
 	}
 	
 	@EventHandler
@@ -29,12 +25,9 @@ public class GoXLeave implements Listener {
 		}
 		
 		Minecart cart = (Minecart)e.getVehicle();
+		GoXCart gc = new GoXCart(cart, plugin);
 		
-		if (!GoXUtils.hasPassenger(cart)) {
-			return;
-		}
-		
-		if (!(cart.getPassenger() instanceof Player)) {
+		if (!gc.hasPlayer()) {
 			return;
 		}
 		

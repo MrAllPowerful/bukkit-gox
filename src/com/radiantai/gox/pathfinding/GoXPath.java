@@ -1,26 +1,25 @@
 package com.radiantai.gox.pathfinding;
 
-import java.util.LinkedList;
 import java.util.Stack;
 
 public class GoXPath {
-	private Stack<String> path;
+	private Stack<GoXDirection> path;
 	private int distance;
 	
 	public GoXPath() {
-		path = new Stack<String>();
+		path = new Stack<GoXDirection>();
 		distance = 0;
 	}
 	
-	public void Push(String s) {
-		path.push(s);
+	public void Push(GoXDirection d) {
+		path.push(d);
 	}
 	
-	public String Peek() {
+	public GoXDirection Peek() {
 		return path.peek();
 	}
 	
-	public String Pop() {
+	public GoXDirection Pop() {
 		return path.pop();
 	}
 	

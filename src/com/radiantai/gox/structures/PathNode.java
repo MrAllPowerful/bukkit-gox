@@ -1,12 +1,13 @@
 package com.radiantai.gox.structures;
 
+import com.radiantai.gox.pathfinding.GoXDirection;
 import com.radiantai.gox.pathfinding.GoXNode;
 
 public class PathNode implements Comparable<PathNode> {
 
 	private final GoXNode current;
 	private PathNode prev;
-	private String fromPrev;
+	private GoXDirection fromPrev;
 	private int distance;
 	private int estimated;
 	
@@ -18,7 +19,7 @@ public class PathNode implements Comparable<PathNode> {
 		this.estimated = Integer.MAX_VALUE;
 	}
 	
-	public PathNode(GoXNode current, PathNode prev, String fromPrev, int distance, int estimated) {
+	public PathNode(GoXNode current, PathNode prev, GoXDirection fromPrev, int distance, int estimated) {
 		this.current = current;
 		this.fromPrev = fromPrev;
 		this.prev = prev;
@@ -46,11 +47,11 @@ public class PathNode implements Comparable<PathNode> {
 		this.estimated = estimated;
 	}
 
-	public String getFromPrev() {
+	public GoXDirection getFromPrev() {
 		return fromPrev;
 	}
 
-	public PathNode setFromPrev(String fromPrev) {
+	public PathNode setFromPrev(GoXDirection fromPrev) {
 		this.fromPrev = fromPrev;
 		return this;
 	}

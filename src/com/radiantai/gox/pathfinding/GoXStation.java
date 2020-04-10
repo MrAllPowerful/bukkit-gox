@@ -1,8 +1,10 @@
 package com.radiantai.gox.pathfinding;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 import com.radiantai.gox.chat.GoXChat;
+import com.radiantai.gox.structures.GoXException;
 
 public class GoXStation extends GoXNode implements Comparable<GoXStation> {
 	private String name;
@@ -14,7 +16,7 @@ public class GoXStation extends GoXNode implements Comparable<GoXStation> {
 		this.dropPoint = null;
 	}
 	
-	public GoXStation(String id, Location location, GoXNode north, GoXNode east, GoXNode south, GoXNode west, String name, String forceDirection, Location dropPoint) {
+	public GoXStation(String id, Location location, GoXNode north, GoXNode east, GoXNode south, GoXNode west, String name, GoXDirection forceDirection, Location dropPoint) {
 		super(id, location, north, east, south, west, forceDirection);
 		this.name = name;
 		this.dropPoint = dropPoint;
@@ -32,12 +34,12 @@ public class GoXStation extends GoXNode implements Comparable<GoXStation> {
 		return dropPoint;
 	}
 
-	public void setDropPoint(Location dropPoint) throws Exception {
+	public void setDropPoint(Location dropPoint) throws GoXException {
 		if (!super.location.getWorld().getName().equals(dropPoint.getWorld().getName())) {
-			throw new Exception(GoXChat.chat("drop same world"));
+			throw new GoXException(GoXChat.chat("drop same world"));
 		}
-		if (dropPoint.distance(super.getLocation()) > 8) {
-			throw new Exception(GoXChat.chat("drop distance")+" "+8);
+		if (dropPoint.distance(super.getLocation()) > 5) {
+			throw new GoXException(GoXChat.chat("drop distance")+" "+5);
 		}
 		this.dropPoint = dropPoint;
 	}
@@ -50,6 +52,11 @@ public class GoXStation extends GoXNode implements Comparable<GoXStation> {
 		return "STATION> Name: "+name
 				+" Id: "+id+" X: "+ location.getBlockX() + " Y: " + location.getBlockY() + " Z: "+location.getBlockZ()+" North: "
 				+norths+" East: "+easts+" South: "+souths+" West: "+wests;
+	}
+	
+	@Override
+	public String chatView() {
+		return ChatColor.GREEN + id;
 	}
 
 	@Override

@@ -4,9 +4,12 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 import com.radiantai.gox.chat.GoXChat;
+import com.radiantai.gox.pathfinding.GoXDirection.Direction;
+import com.radiantai.gox.structures.GoXException;
 
 public class GoXNode {
 	protected String id;
@@ -15,7 +18,7 @@ public class GoXNode {
 	protected GoXNode east;
 	protected GoXNode south;
 	protected GoXNode west;
-	protected String forceDirection;
+	protected GoXDirection forceDirection;
 	protected List<GoXNode> references;
 	
 	public GoXNode(Location location) {
@@ -24,7 +27,7 @@ public class GoXNode {
 		this.references = new LinkedList<GoXNode>();
 	}
 	
-	public GoXNode(String id, Location location, GoXNode north, GoXNode east, GoXNode south, GoXNode west, String forceDirection) {
+	public GoXNode(String id, Location location, GoXNode north, GoXNode east, GoXNode south, GoXNode west, GoXDirection forceDirection) {
 		this.id = id;
 		this.location = GoXUtils.floorLocation(location);
 		this.north = north;
@@ -95,11 +98,11 @@ public class GoXNode {
 		this.west = west;
 	}
 
-	public String getForceDirection() {
+	public GoXDirection getForceDirection() {
 		return forceDirection;
 	}
 
-	public void setForceDirection(String forceDirection) {
+	public void setForceDirection(GoXDirection forceDirection) {
 		this.forceDirection = forceDirection;
 	}
 	
@@ -119,23 +122,26 @@ public class GoXNode {
 		references = new LinkedList<GoXNode>();
 	}
 
-	public GoXNode getLink(String dir) {
-		switch (dir) {
-			case "north":
+	public GoXNode getLink(GoXDirection dir) {
+		switch (dir.getDir()) {
+			case NORTH:
 				return north;
-			case "east":
+			case EAST:
 				return east;
-			case "south":
+			case SOUTH:
 				return south;
-			case "west":
+			case WEST:
 				return west;
 		}
 		return null;
 	}
 	
-	public void autoLink(GoXNode to) throws Exception {
+	public void autoLink(GoXNode to) throws GoXException {
 		if (this.getId().equals(to.getId())) {
-			throw new Exception(GoXChat.chat("to itself"));
+			throw new GoXException(GoXChat.chat("to itself"));
+		}
+		if (getWorld().equals(to.getWorld())) {
+			throw new GoXException(GoXChat.chat("different worlds"));
 		}
 		if (this.getZ()==to.getZ()) {
 			if (this.getX() > to.getX()) {
@@ -162,64 +168,74 @@ public class GoXNode {
 			to.addReference(this);
 		}
 		else {
-			throw new Exception(GoXChat.chat("one line"));
+			throw new GoXException(GoXChat.chat("one line"));
 		}
 	}
 	
-	public void setLink(String dir, GoXNode node) throws Exception {
+	public void setLink(GoXDirection dir, GoXNode node) throws GoXException {
 		if (node != null && id.equals(node.getId())) {
-			throw new Exception(GoXChat.chat("to itself"));
+			throw new GoXException(GoXChat.chat("to itself"));
 		}
-		switch (dir) {
-			case "north":
+		if (getWorld().equals(node.getWorld())) {
+			throw new GoXException(GoXChat.chat("different worlds"));
+		}
+		switch (dir.getDir()) {
+			case NORTH:
 				north = node;
 				node.addReference(this);
 				break;
-			case "east":
+			case EAST:
 				east = node;
 				node.addReference(this);
 				break;
-			case "south":
+			case SOUTH:
 				south = node;
 				node.addReference(this);
 				break;
-			case "west":
+			case WEST:
 				west = node;
 				node.addReference(this);
 				break;
 		}
 	}
 	
-	public void unlink(String dir) {
+	public void unlink(GoXDirection dir) {
 		if (dir == null) {
 			return;
 		}
-		switch (dir) {
-			case "north":
+		switch (dir.getDir()) {
+			case NORTH:
 				if (north != null) {
 					north.removeReference(this);
 					north = null;
 				}
 				break;
-			case "east":
+			case EAST:
 				if (east != null) {
 					east.removeReference(this);
 					east = null;
 				}
 				break;
-			case "south":
+			case SOUTH:
 				if (south != null) {
 					south.removeReference(this);
 					south = null;
 				}
 				break;
-			case "west":
+			case WEST:
 				if (west != null) {
 					west.removeReference(this);
 					west = null;
 				}
 				break;
 		}
+	}
+	
+	public void unlinkAll() {
+		unlink(new GoXDirection(Direction.NORTH));
+		unlink(new GoXDirection(Direction.EAST));
+		unlink(new GoXDirection(Direction.WEST));
+		unlink(new GoXDirection(Direction.SOUTH));
 	}
 	
 	public void unlinkById(String id) {
@@ -235,16 +251,16 @@ public class GoXNode {
 		}
 	}
 	
-	public String isLinked(String id) {
+	public GoXDirection isLinked(String id) {
 		if (id != null) {
 			if (north != null && north.getId().equals(id))
-				return "north";
+				return new GoXDirection(Direction.NORTH);
 			if (east != null && east.getId().equals(id))
-				return "east";
+				return new GoXDirection(Direction.EAST);
 			if (south != null && south.getId().equals(id))
-				return "south";
+				return new GoXDirection(Direction.SOUTH);
 			if (west != null && west.getId().equals(id))
-				return "west";
+				return new GoXDirection(Direction.WEST);
 		}
 		return null;
 	}
@@ -266,6 +282,10 @@ public class GoXNode {
 		String souths = south == null ? "" : south.getId();
 		String wests = west == null ? "" : west.getId();
 		return "Node> Id: "+id+" X: "+location.getBlockX()+ " Y: " + location.getBlockY() +" Z: "+location.getBlockZ()+" North: "+norths+" East: "+easts+" South: "+souths+" West: "+wests;
+	}
+	
+	public String chatView() {
+		return ChatColor.BLUE + id;
 	}
 	
 	public static Comparator<GoXNode> distanceToLocationComparator(Location other) {

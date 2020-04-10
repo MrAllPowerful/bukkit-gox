@@ -13,8 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -26,7 +24,6 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,6 +31,8 @@ import org.bukkit.entity.Player;
 
 import com.radiantai.gox.GoX;
 import com.radiantai.gox.chat.GoXChat;
+import com.radiantai.gox.pathfinding.GoXDirection.Direction;
+import com.radiantai.gox.structures.GoXException;
 import com.radiantai.gox.structures.PathNode;
 
 public class GoXMap {
@@ -53,13 +52,13 @@ public class GoXMap {
 		nodes.add(node);
 	}
 	
-	public static void AddNode(Location location) throws Exception {
+	public static void AddNode(Location location) throws GoXException {
 		GoXNode node = GoXMap.GetNode(location);
 		if (node != null) {
-			throw new Exception(GoXChat.chat("already location"));
+			throw new GoXException(GoXChat.chat("already location"));
 		}
 		if (isNearby(location)) {
-			throw new Exception(GoXChat.chat("cannot touch"));
+			throw new GoXException(GoXChat.chat("cannot touch"));
 		}
 		nodes.add(new GoXNode(location));
 	}
@@ -70,52 +69,52 @@ public class GoXMap {
 		}
 	}
 	
-	public static void AddStation(String name, Location location) throws Exception {
+	public static void AddStation(String name, Location location) throws GoXException {
 		String idName = name.toLowerCase();
 		GoXNode node = GoXMap.GetNode(location);
 		if (node != null) {
-			throw new Exception(GoXChat.chat("already location"));
+			throw new GoXException(GoXChat.chat("already location"));
 		}
 		if (stations.get(idName) != null) {
-			throw new Exception(GoXChat.chat("already name"));
+			throw new GoXException(GoXChat.chat("already name"));
 		}
 		if (!GoXUtils.validateName(name)) {
-			throw new Exception(GoXChat.chat("invalid name"));
+			throw new GoXException(GoXChat.chat("invalid name"));
 		}
 		List<String> reserved = config.getStringList("prohibited stations");
 		if (reserved.contains(idName)) {
-			throw new Exception(GoXChat.chat("name reserved"));
+			throw new GoXException(GoXChat.chat("name reserved"));
 		}
 		if (isNearby(location)) {
-			throw new Exception(GoXChat.chat("cannot touch"));
+			throw new GoXException(GoXChat.chat("cannot touch"));
 		}
 		GoXStation newst = new GoXStation(name, location);
 		nodes.add(newst);
 		stations.put(idName, newst);
 	}
 	
-	public static void renameStation(String oldName, String newName) throws Exception {
+	public static void renameStation(String oldName, String newName) throws GoXException {
 		String oldLowerName = oldName.toLowerCase();
 		String newLowername = newName.toLowerCase();
 		
 		GoXStation st = stations.get(oldLowerName);
 		
 		if (st == null) {
-			throw new Exception(GoXChat.chat("no such station"));
+			throw new GoXException(GoXChat.chat("no such station"));
 		}
 		if (!GoXUtils.validateName(newLowername)) {
-			throw new Exception(GoXChat.chat("invalid name"));
+			throw new GoXException(GoXChat.chat("invalid name"));
 		}
 		
 		GoXStation otherSt = stations.get(newLowername);
 		
 		if (otherSt != null && !otherSt.getId().equals(st.getId())) {
-			throw new Exception(GoXChat.chat("already name"));
+			throw new GoXException(GoXChat.chat("already name"));
 		}
 		
 		List<String> reserved = config.getStringList("prohibited stations");
 		if (reserved.contains(newLowername)) {
-			throw new Exception(GoXChat.chat("name reserved"));
+			throw new GoXException(GoXChat.chat("name reserved"));
 		}
 		
 		stations.remove(oldName);
@@ -123,30 +122,30 @@ public class GoXMap {
 		stations.put(newName, st);
 	}
 	
-	public static void RemoveStation(String name) throws Exception {
+	public static void RemoveStation(String name) throws GoXException {
 		if (stations != null) {
 			GoXStation st = stations.get(name.toLowerCase());
 			if (st == null) {
-				throw new Exception(GoXChat.chat("no such station"));
+				throw new GoXException(GoXChat.chat("no such station"));
 			}
 			RemoveNodeP(st.getId());
 			stations.remove(name);
 		}
 	}
 	
-	public static void RemoveNode(String id) throws Exception {
+	public static void RemoveNode(String id) throws GoXException {
 		GoXNode node = GetNode(id);
 		if (node instanceof GoXStation) {
-			throw new Exception(GoXChat.chat("cannot remove node"));
+			throw new GoXException(GoXChat.chat("cannot remove node"));
 		}
 		RemoveNodeP(id);
 	}
 	
-	private static void RemoveNodeP(String id) throws Exception {
+	private static void RemoveNodeP(String id) throws GoXException {
 		if (nodes != null) {
 			GoXNode node = GetNode(id);
 			if (!nodes.removeIf(n -> (n.getId() == id))) {
-				throw new Exception(GoXChat.chat("no such node"));
+				throw new GoXException(GoXChat.chat("no such node"));
 			}
 			removeAllReferencedLinks(node);
 		}
@@ -192,24 +191,31 @@ public class GoXMap {
 			link.unlinkById(node.getId());
 		}
 		node.clearReferences();
-		node.unlink("north");
-		node.unlink("east");
-		node.unlink("south");
-		node.unlink("west");
+		node.unlinkAll();
 	}
 	
-	public static void LinkNodesManual(GoXNode from, String fromDir, GoXNode to, String toDir) throws Exception {
-		fromDir = fromDir.toLowerCase();
-		toDir = toDir.toLowerCase();
-		
+	public static void LinkNodesManual(GoXNode from, GoXDirection fromDir, GoXNode to, GoXDirection toDir) throws GoXException {
 		if (from.getId().equals(to.getId())) {
-			throw new Exception(GoXChat.chat("to itself"));
+			throw new GoXException(GoXChat.chat("to itself"));
 		}
-		
+		if (from.getWorld().equals(to.getWorld())) {
+			throw new GoXException(GoXChat.chat("different worlds"));
+		}
 		from.setLink(fromDir, to);
 		to.setLink(toDir, from);
 		
 		from.addReference(to);
+		to.addReference(from);
+	}
+	
+	public static void LinkNodesManualOnesided(GoXNode from, GoXDirection fromDir, GoXNode to) throws GoXException {
+		if (from.getId().equals(to.getId())) {
+			throw new GoXException(GoXChat.chat("to itself"));
+		}
+		if (from.getWorld().equals(to.getWorld())) {
+			throw new GoXException(GoXChat.chat("different worlds"));
+		}
+		from.setLink(fromDir, to);
 		to.addReference(from);
 	}
 	
@@ -253,33 +259,33 @@ public class GoXMap {
 			if (curr.getId().equals(finish)) {
 				return constructPath(currNode);
 			}
-			String forcedDirection = curr.getForceDirection() != null ? curr.getForceDirection() : "null";
-			if (curr.getNorth() != null && !closeSet.contains(curr.getNorth().getId()) && !forcedDirection.equals("south")) {
+			GoXDirection forcedDirection = curr.getForceDirection();
+			if (curr.getNorth() != null && !closeSet.contains(curr.getNorth().getId()) && (forcedDirection == null || !forcedDirection.equals(new GoXDirection(Direction.SOUTH)))) {
 				GoXNode node = curr.getNorth();
 				int addedDistance = distance + curr.blockDistance(node);
 				int estimated = addedDistance + node.blockDistance(finishNode);
-				PathNode pathNode = new PathNode(node, currNode, "north", addedDistance, estimated);
+				PathNode pathNode = new PathNode(node, currNode, new GoXDirection(Direction.NORTH), addedDistance, estimated);
 				openSet.add(pathNode);
 			}
-			if (curr.getEast() != null && !closeSet.contains(curr.getEast().getId()) && !forcedDirection.equals("west")) {
+			if (curr.getEast() != null && !closeSet.contains(curr.getEast().getId()) && (forcedDirection == null || !forcedDirection.equals(new GoXDirection(Direction.WEST)))) {
 				GoXNode node = curr.getEast();
 				int addedDistance = distance + curr.blockDistance(node);
 				int estimated = addedDistance + node.blockDistance(finishNode);
-				PathNode pathNode = new PathNode(node, currNode, "east", addedDistance, estimated);
+				PathNode pathNode = new PathNode(node, currNode, new GoXDirection(Direction.EAST), addedDistance, estimated);
 				openSet.add(pathNode);
 			}
-			if (curr.getSouth() != null && !closeSet.contains(curr.getSouth().getId()) && !forcedDirection.equals("north")) {
+			if (curr.getSouth() != null && !closeSet.contains(curr.getSouth().getId()) && (forcedDirection == null || !forcedDirection.equals(new GoXDirection(Direction.NORTH)))) {
 				GoXNode node = curr.getSouth();
 				int addedDistance = distance + curr.blockDistance(node);
 				int estimated = addedDistance + node.blockDistance(finishNode);
-				PathNode pathNode = new PathNode(node, currNode, "south", addedDistance, estimated);
+				PathNode pathNode = new PathNode(node, currNode, new GoXDirection(Direction.SOUTH), addedDistance, estimated);
 				openSet.add(pathNode);
 			}
-			if (curr.getWest() != null && !closeSet.contains(curr.getWest().getId()) && !forcedDirection.equals("east")) {
+			if (curr.getWest() != null && !closeSet.contains(curr.getWest().getId()) && (forcedDirection == null || !forcedDirection.equals(new GoXDirection(Direction.EAST)))) {
 				GoXNode node = curr.getWest();
 				int addedDistance = distance + curr.blockDistance(node);
 				int estimated = addedDistance + node.blockDistance(finishNode);
-				PathNode pathNode = new PathNode(node, currNode, "west", addedDistance, estimated);
+				PathNode pathNode = new PathNode(node, currNode, new GoXDirection(Direction.WEST), addedDistance, estimated);
 				openSet.add(pathNode);
 			}
 		}
@@ -384,7 +390,7 @@ public class GoXMap {
 		    	  nodeWriter.newLine();
 		    	  nodeWriter.write(node.getWest()!=null?node.getWest().getId():"null");
 		    	  nodeWriter.newLine();
-		    	  nodeWriter.write(node.getForceDirection()!=null?node.getForceDirection():"null");
+		    	  nodeWriter.write(node.getForceDirection()!=null?node.getForceDirection().toString():"null");
 		    	  nodeWriter.newLine();
 		    	  if (node instanceof GoXStation) {
 		    		  GoXStation st = (GoXStation) node;
@@ -448,7 +454,7 @@ public class GoXMap {
             	bufferedReader.readLine();
             	bufferedReader.readLine();
             	line = bufferedReader.readLine();
-            	String forceDirection = line.equals("null") ? null : line;
+            	GoXDirection forceDirection = line.equals("null") ? null : new GoXDirection(line);
             	line = bufferedReader.readLine();
             	Location locationD = null;
             	tokens = line.split(",");
@@ -487,8 +493,7 @@ public class GoXMap {
             
             while((line = bufferedReader.readLine()) != null) {
             	String id = line;
-            	line = bufferedReader.readLine();
-            	String stationName = line;
+            	line = bufferedReader.readLine(); //stationName
             	line = bufferedReader.readLine(); //worldName
             	line = bufferedReader.readLine(); //location
             	line = bufferedReader.readLine();
@@ -534,6 +539,9 @@ public class GoXMap {
         }
         catch(IOException e) {
             logger.warning("Error reading file '" + name + "' "+ e.getStackTrace());
+        }
+		catch (Exception e) {
+			logger.warning("Error reading file '" + name + "' "+ e.getStackTrace());
         }
 	}
 }

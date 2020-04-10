@@ -36,6 +36,7 @@ lang:
       x: "X"
       y: "Y"
       z: "Z"
+      world: "World"
       connection: "Connection:"
       north: "North"
       east: "East"
@@ -76,6 +77,7 @@ lang:
       seconds: "seconds"
       references: "Incoming links"
       rename success: "Renamed successfully!"
+      different worlds: "You cannot perform any actions with the nodes from different worlds!"
 config:
    node block: 45
    station block: 87

@@ -36,6 +36,7 @@ lang:
     x: X
     y: Y
     z: Z
+    world: "Мир"
     connection: "Связь:"
     north: "Север"
     east: "Восток"
@@ -75,6 +76,7 @@ lang:
     seconds: "секунд"
     references: "Входящие соединения"
     rename success: "Переименованно!"
+    different worlds: "Вы не можете проводить операции с узлами в разных мирах!"
 config:
   node block: 45
   station block: 87

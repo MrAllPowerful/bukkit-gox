@@ -6,38 +6,33 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
 
 import com.radiantai.gox.GoX;
 import com.radiantai.gox.chat.GoXChat;
 import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.pathfinding.GoXNode;
 import com.radiantai.gox.pathfinding.GoXStation;
-import com.radiantai.gox.pathfinding.GoXUtils;
+import com.radiantai.gox.structures.GoXException;
+import com.radiantai.gox.structures.GoXPermissionException;
 import com.radiantai.gox.structures.GoXPlayer;
 
 public class Go implements CommandExecutor {
 	
 	private GoX plugin;
 	private Logger logger;
-	private ConfigurationSection chatConfig;
 	
 	public Go(GoX plugin) {
 		this.plugin = plugin;
 		this.logger = Logger.getLogger("Minecraft");
-		this.chatConfig = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("commands");
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args) {
 		try {
+			
 			if (!(sender instanceof Player)) {
-				sender.sendMessage("You must be a player to execute this command!");
-				return false;
+				throw new Exception("You must be a player to execute this command!");
 			}
 			
 			Player player = (Player) sender;
@@ -49,6 +44,12 @@ public class Go implements CommandExecutor {
 				sender.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/go <command> "+GoXChat.chat("or")+" /go <station>");
 			}
 		}
+		catch (GoXPermissionException e) {
+			sender.sendMessage(ChatColor.DARK_RED + GoXChat.chat("no access"));
+		}
+		catch (GoXException e) {
+			sender.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
+		}
 		catch (Exception e) {
 			sender.sendMessage(ChatColor.DARK_RED + GoXChat.chat("fatal error"));
 			logger.warning(e.getMessage());
@@ -56,7 +57,7 @@ public class Go implements CommandExecutor {
 		return false;
 	}
 	
-	private void executeArgs(Player player, Command cmd, String cmdLabel, String[] args) {
+	private void executeArgs(Player player, Command cmd, String cmdLabel, String[] args) throws Exception {
 		if (player.hasPermission("GoX.Go")) {
 			String action = args[0];
 			switch (action) {
@@ -85,11 +86,11 @@ public class Go implements CommandExecutor {
 		}
 	}
 	
-	private void executeClosest(Player player, String[] args) {
+	private void executeClosest(Player player, String[] args) throws Exception {
 		GoXChat.closestList(player, 3);
 	}
 	
-	private void executeList(Player player, String[] args) {
+	private void executeList(Player player, String[] args) throws Exception {
 		int page = 1;
 		if (args.length > 1) {
 			try {
@@ -108,7 +109,7 @@ public class Go implements CommandExecutor {
 		
 	}
 
-	private void executeInfo(Player player, String[] args) {
+	private void executeInfo(Player player, String[] args) throws Exception {
 		if (args.length < 2) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/go info <station name>");
 			return;
@@ -124,7 +125,7 @@ public class Go implements CommandExecutor {
 		
 	}
 
-	private void executeGo(Player player, String[] args) {
+	private void executeGo(Player player, String[] args) throws Exception {
 		GoXStation st = GoXMap.GetStation(args[0]);
 		if (st == null) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("no station"));
@@ -137,13 +138,13 @@ public class Go implements CommandExecutor {
 		player.sendMessage(ChatColor.GREEN + GoXChat.chat("sit"));
 	}
 	
-	private void executeCancel(Player player, String[] args) {
+	private void executeCancel(Player player, String[] args) throws Exception {
 		GoXPlayer p = new GoXPlayer(player, plugin);
 		p.reset();
 		player.sendMessage(ChatColor.GREEN + GoXChat.chat("canceled"));
 	}
 	
-	private void executeCurrent(Player player, String[] args) {
+	private void executeCurrent(Player player, String[] args) throws Exception {
 		GoXPlayer p = new GoXPlayer(player, plugin);
 		String id = p.getDestination();
 		if (id != null) {

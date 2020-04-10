@@ -1,17 +1,12 @@
 package com.radiantai.gox.structures;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
-import com.radiantai.gox.chat.GoXChat;
-import com.radiantai.gox.pathfinding.GoXMap;
-import com.radiantai.gox.pathfinding.GoXNode;
+import com.radiantai.gox.pathfinding.GoXDirection;
 import com.radiantai.gox.pathfinding.GoXPath;
-import com.radiantai.gox.pathfinding.GoXUtils;
 
 public class GoXPlayer {
 	
@@ -39,7 +34,7 @@ public class GoXPlayer {
 		this.plugin = plugin;
 	}
 
-	public void setNext(String dir) {
+	public void setNext(GoXDirection dir) {
 		if (dir==null) {
 			if (player.hasMetadata("go_next")) {
 				player.removeMetadata("go_next", plugin);
@@ -127,10 +122,10 @@ public class GoXPlayer {
 		return result;
 	}
 	
-	public String getNext() {
-		String result = null;
+	public GoXDirection getNext() {
+		GoXDirection result = null;
 		if (player.hasMetadata("go_next")) {
-			result = player.getMetadata("go_next").get(0).asString();
+			result = (GoXDirection) player.getMetadata("go_next").get(0).value();
 			if (result == null) {
 				player.removeMetadata("go_next", plugin);
 			}
@@ -171,8 +166,8 @@ public class GoXPlayer {
 		return result;
 	}
 	
-	public String popPath() {
-		String result = null;
+	public GoXDirection popPath() {
+		GoXDirection result = null;
 		if (player.hasMetadata("go_path")) {
 			GoXPath path = (GoXPath) player.getMetadata("go_path").get(0).value();
 			if (path == null || path.IsEmpty()) {
@@ -185,8 +180,8 @@ public class GoXPlayer {
 		return result;
 	}
 	
-	public String peekPath() {
-		String result = null;
+	public GoXDirection peekPath() {
+		GoXDirection result = null;
 		if (player.hasMetadata("go_path")) {
 			GoXPath path = (GoXPath) player.getMetadata("go_path").get(0).value();
 			if (path == null) {
@@ -210,5 +205,38 @@ public class GoXPlayer {
 		setNext(null);
 		setPath(null);
 		setExpected(null);
+	}
+	
+	public void resetAdd() {
+		setAddNode(null);
+		setAddstation(null);
+	}
+	
+	public String getPlayerDirection() {
+		double rot = player.getLocation().getYaw();
+		if (rot < 0) {
+			rot = rot+360;
+		}
+		if (0 <= rot && rot < 22.5) {
+            return "south";
+        } else if (22.5 <= rot && rot < 67.5) {
+            return "southwest";
+        } else if (67.5 <= rot && rot < 112.5) {
+            return "west";
+        } else if (112.5 <= rot && rot < 157.5) {
+            return "northwest";
+        } else if (157.5 <= rot && rot < 202.5) {
+            return "north";
+        } else if (202.5 <= rot && rot < 247.5) {
+            return "northeast";
+        } else if (247.5 <= rot && rot < 292.5) {
+            return "east";
+        } else if (292.5 <= rot && rot < 337.5) {
+            return "southeast";
+        } else if (337.5 <= rot && rot < 360.0) {
+            return "south";
+        } else {
+            return "undefined";
+        }
 	}
 }

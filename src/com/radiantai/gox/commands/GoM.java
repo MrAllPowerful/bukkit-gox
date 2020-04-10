@@ -1,54 +1,41 @@
 package com.radiantai.gox.commands;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
-import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
 import com.radiantai.gox.chat.GoXChat;
+import com.radiantai.gox.pathfinding.GoXDirection;
 import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.pathfinding.GoXNode;
 import com.radiantai.gox.pathfinding.GoXPath;
 import com.radiantai.gox.pathfinding.GoXStation;
-import com.radiantai.gox.pathfinding.GoXUtils;
+import com.radiantai.gox.structures.GoXException;
+import com.radiantai.gox.structures.GoXPermissionException;
 import com.radiantai.gox.structures.GoXPlayer;
 
 public class GoM implements CommandExecutor {
 	
 	private GoX plugin;
 	private Logger logger;
-	private ConfigurationSection chatConfig;
-	private ConfigurationSection config;
 	
 	public GoM(GoX plugin) {
 		this.plugin = plugin;
 		this.logger = Logger.getLogger("Minecraft");
-		this.config = plugin.getConfig().getConfigurationSection("config");
-		this.chatConfig = plugin.getConfig().getConfigurationSection("lang").getConfigurationSection("commands");
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args) {
 		try {
+			
 			if (!(sender instanceof Player)) {
-				sender.sendMessage("You must be a player to execute this command!");
-				return false;
+				throw new Exception("You must be a player to execute this command!");
 			}
 			
 			Player player = (Player) sender;
@@ -57,8 +44,14 @@ public class GoM implements CommandExecutor {
 				executeArgs(player, cmd, cmdLabel, args);
 			}
 			else {
-				sender.sendMessage(ChatColor.RED + GoXChat.chat("usage") + "/gom <command>");
+				sender.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom <command>");
 			}
+		}
+		catch (GoXPermissionException e) {
+			sender.sendMessage(ChatColor.DARK_RED + GoXChat.chat("no access"));
+		}
+		catch (GoXException e) {
+			sender.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
 		}
 		catch (Exception e) {
 			sender.sendMessage(ChatColor.DARK_RED + GoXChat.chat("fatal error"));
@@ -67,7 +60,7 @@ public class GoM implements CommandExecutor {
 		return false;
 	}
 	
-	private void executeArgs(Player player, Command cmd, String cmdLabel, String[] args) {
+	private void executeArgs(Player player, Command cmd, String cmdLabel, String[] args) throws Exception {
 		if (player.hasPermission("GoX.GoM")) {
 			String action = args[0];
 			switch (action) {
@@ -116,7 +109,7 @@ public class GoM implements CommandExecutor {
 		}
 	}
 	
-	private void executeRename(Player player, String[] args) {
+	private void executeRename(Player player, String[] args) throws Exception {
 		if (args.length < 3) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom rename <old-name> <new-name>");
 			return;
@@ -124,18 +117,12 @@ public class GoM implements CommandExecutor {
 		String oldName = args[1];
 		String newName = args[2];
 		
-		try {
-			GoXMap.renameStation(oldName, newName);
-		}
-		catch (Exception e) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
-			return;
-		}
+		GoXMap.renameStation(oldName, newName);
 		
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("rename success"));
 	}
 
-	private void executeSetdrop(Player player, String[] args) {
+	private void executeSetdrop(Player player, String[] args) throws Exception {
 		if (args.length < 2) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom setdrop <name>");
 			return;
@@ -149,19 +136,13 @@ public class GoM implements CommandExecutor {
 		
 		Location location = player.getLocation();
 		
-		try {
-			st.setDropPoint(location);
-		}
-		catch (Exception e) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
-			return;
-		}
+		st.setDropPoint(location);
 		
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("drop point success"));
 		
 	}
 
-	private void executeUnforce(Player player, String[] args) {
+	private void executeUnforce(Player player, String[] args) throws Exception {
 		Location location = player.getLocation();
 		GoXNode node = GoXMap.GetNode(location);
 		
@@ -175,13 +156,10 @@ public class GoM implements CommandExecutor {
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("unforce success"));
 	}
 
-	private void executeForce(Player player, String[] args) {
-		String dir = GoXUtils.getPlayerDirection(player);
+	private void executeForce(Player player, String[] args) throws Exception {
 		
-		if (!GoXUtils.isValidDirection(dir)) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction")+dir);
-			return;
-		}
+		String dir = new GoXPlayer(player, plugin).getPlayerDirection();
+		GoXDirection gd = new GoXDirection(dir);
 		
 		Location location = player.getLocation();
 		GoXNode node = GoXMap.GetNode(location);
@@ -191,18 +169,19 @@ public class GoM implements CommandExecutor {
 			return;
 		}
 		
-		node.setForceDirection(dir);
+		node.setForceDirection(gd);
 		
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("force success"));
 		
 	}
 
-	private void executeAdd(Player player, String[] args) {
-		if (player.hasMetadata("go_add")) {
-			
-			GoXPlayer gp = new GoXPlayer(player, plugin);
-			Location location = gp.getAddNode();
-			gp.setAddNode(null);
+	private void executeAdd(Player player, String[] args) throws Exception {
+		
+		GoXPlayer gp = new GoXPlayer(player, plugin);
+		Location location = gp.getAddNode();
+		
+		if (location != null) {
+			gp.resetAdd();
 			
 			player.removeMetadata("go_add", plugin);
 			if (location.getBlock().getType() != plugin.getNodeBlock()) {
@@ -210,13 +189,9 @@ public class GoM implements CommandExecutor {
 				return;
 			}
 			player.sendMessage(ChatColor.YELLOW + GoXChat.chat("adding node"));
-			try {
-				GoXMap.AddNode(location);
-			}
-			catch (Exception e) {
-				player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
-				return;
-			}
+			
+			GoXMap.AddNode(location);
+			
 			player.sendMessage(ChatColor.GREEN + GoXChat.chat("adding success"));
 		}
 		else {
@@ -225,17 +200,18 @@ public class GoM implements CommandExecutor {
 		}
 	}
 	
-	private void executeAddstation(Player player, String[] args) {
-		if (player.hasMetadata("go_add_station")) {
-			if (args.length < 2) {
-				player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom addstation <name>");
-				return;
-			}
-			String name = args[1];
-			
-			GoXPlayer gp = new GoXPlayer(player, plugin);
-			Location location = gp.getAddstation();
-			gp.setAddstation(null);
+	private void executeAddstation(Player player, String[] args) throws Exception {
+		if (args.length < 2) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom addstation <name>");
+			return;
+		}
+		String name = args[1];
+		
+		GoXPlayer gp = new GoXPlayer(player, plugin);
+		Location location = gp.getAddstation();
+		
+		if (location != null) {
+			gp.resetAdd();
 			
 			player.removeMetadata("go_add_station", plugin);
 			if (location.getBlock().getType() != plugin.getStationBlock()) {
@@ -243,13 +219,9 @@ public class GoM implements CommandExecutor {
 				return;
 			}
 			player.sendMessage(ChatColor.YELLOW + "Adding a new station...");
-			try {
-				GoXMap.AddStation(name, location);
-			}
-			catch (Exception e) {
-				player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
-				return;
-			}
+			
+			GoXMap.AddStation(name, location);
+			
 			player.sendMessage(ChatColor.GREEN + GoXChat.chat("adding success"));
 		}
 		else {
@@ -258,18 +230,14 @@ public class GoM implements CommandExecutor {
 		}
 	}
 	
-	private void executeRemove(Player player, String[] args) {
+	private void executeRemove(Player player, String[] args) throws Exception {
 		Location location = player.getLocation();
 		GoXNode node = GoXMap.GetNode(location);
 		if (node != null) {
 			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("removing"));
-			try {
-				GoXMap.RemoveNode(node.getId());
-			}
-			catch (Exception e) {
-				player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
-				return;
-			}
+			
+			GoXMap.RemoveNode(node.getId());
+			
 			player.sendMessage(ChatColor.GREEN+GoXChat.chat("removing success"));
 		}
 		else {
@@ -277,67 +245,69 @@ public class GoM implements CommandExecutor {
 		}
 	}
 	
-	private void executeRemovestation(Player player, String[] args) {
+	private void executeRemovestation(Player player, String[] args) throws Exception {
 		if (args.length < 2) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom removestation <name>");
 			return;
 		}
 		String name = args[1];
 		player.sendMessage(ChatColor.YELLOW+GoXChat.chat("removing"));
-		try {
-			GoXMap.RemoveStation(name);
-		}
-		catch (Exception e) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
-			return;
-		}
+		
+		GoXMap.RemoveStation(name);
+		
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("removing success"));
 	}
 	
-	private void executeUnlink(Player player, String[] args) {
-		if (args.length < 2) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom unlink <direction>");
+	private void executeUnlink(Player player, String[] args) throws Exception {
+		
+		GoXNode node = null;
+		GoXDirection gd = null;
+		
+		if (args.length == 2) {
+			Location location = player.getLocation();
+			node = GoXMap.GetNode(location);
+			gd = new GoXDirection(args[1]);
+			if (node == null) {
+				player.sendMessage(ChatColor.RED+GoXChat.chat("stand over"));
+				return;
+			}
+		}
+		else if (args.length == 3) {
+			node = GoXMap.GetNode(args[1]);
+			gd = new GoXDirection(args[2]);
+			if (node == null) {
+				player.sendMessage(ChatColor.RED+GoXChat.chat("no such node"));
+				return;
+			}
+		}
+		else {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom unlink [id] <direction>");
 			return;
 		}
-		String dir = args[1].toLowerCase();
 		
-		if (!GoXUtils.isValidDirection(dir)) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction")+dir);
-			return;
-		}
-		
-		Location location = player.getLocation();
-		GoXNode node = GoXMap.GetNode(location);
-		
-		if (node == null) {
-			player.sendMessage(ChatColor.RED+GoXChat.chat("stand over"));
-			return;
-		}
-		
-		GoXNode linked = node.getLink(dir);
+		GoXNode linked = node.getLink(gd);
 		
 		if (linked == null) {
 			player.sendMessage(ChatColor.RED+GoXChat.chat("no link"));
 			return;
 		}
-		try {
-			node.unlink(dir);
-		}
-		catch (Exception e) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
-			return;
-		}
+		
+		node.unlink(gd);
 		
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("unlink success"));
 	}
 	
-	private void executeLink(Player player, String[] args) {
+	private void executeLink(Player player, String[] args) throws Exception {
 		if (args.length == 2) {
 			executeAutoLink(player, args);
 			return;
 		}
 		else if (args.length == 3) {
 			executeOnesidedLink(player, args);
+			return;
+		}
+		else if (args.length == 4) {
+			executeManualOnesidedLink(player, args);
 			return;
 		}
 		else if (args.length == 5) {
@@ -347,12 +317,13 @@ public class GoM implements CommandExecutor {
 		else {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <id>");
 			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <direction> <id>");
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <from-id> <direction> <to-id>");
 			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <from-id> <direction> <to-id> <direction>");
 			return;
 		}
 	}
 	
-	private void executeAutoLink(Player player, String[] args) {
+	private void executeAutoLink(Player player, String[] args) throws Exception {
 		
 		String id = args[1].toLowerCase();
 		
@@ -368,35 +339,21 @@ public class GoM implements CommandExecutor {
 			return;
 		}
 		player.sendMessage(ChatColor.YELLOW+GoXChat.chat("linking"));
-		try {
-			from.autoLink(to);
-		}
-		catch (Exception e) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
-			return;
-		}
+		
+		from.autoLink(to);
+		
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("linking success"));
 	}
 	
-	private void executeManualLink(Player player, String[] args) {
+	private void executeManualLink(Player player, String[] args) throws Exception {
 		if (args.length < 5) {
 			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <from-id> <direction> <to-id> <direction>");
 			return;
 		}
 		String fromId = args[1].toLowerCase();
-		String fromDir = args[2].toLowerCase();
+		GoXDirection fromDir = new GoXDirection(args[2]);
 		String toId = args[3].toLowerCase();
-		String toDir = args[4].toLowerCase();
-		
-		if (!GoXUtils.isValidDirection(fromDir)) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction")+fromDir);
-			return;
-		}
-		
-		if (!GoXUtils.isValidDirection(toDir)) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction")+toDir);
-			return;
-		}
+		GoXDirection toDir = new GoXDirection(args[4]);
 		
 		GoXNode from = GoXMap.GetNode(fromId);
 		GoXNode to = GoXMap.GetNode(toId);
@@ -422,14 +379,43 @@ public class GoM implements CommandExecutor {
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("linking success"));
 	}
 	
-	private void executeOnesidedLink(Player player, String[] args) {
-		String id = args[2].toLowerCase();
-		String dir = args[1].toLowerCase();
-		
-		if (!GoXUtils.isValidDirection(dir)) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("invalid direction")+dir);
+	private void executeManualOnesidedLink(Player player, String[] args) throws Exception {
+		if (args.length < 4) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("usage")+"/gom link <from-id> <direction> <to-id>");
 			return;
 		}
+		String fromId = args[1].toLowerCase();
+		GoXDirection fromDir = new GoXDirection(args[2]);
+		String toId = args[3].toLowerCase();
+		
+		GoXNode from = GoXMap.GetNode(fromId);
+		GoXNode to = GoXMap.GetNode(toId);
+		
+		if (from == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("no such node")+": "+fromId);
+			return;
+		}
+		if (to == null) {
+			player.sendMessage(ChatColor.RED+GoXChat.chat("no such node")+": "+toId);
+			return;
+		}
+		
+		player.sendMessage(ChatColor.YELLOW+GoXChat.chat("linking"));
+		try {
+			GoXMap.LinkNodesManualOnesided(from, fromDir, to);
+		}
+		catch (Exception e) {
+			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
+			return;
+		}
+		
+		player.sendMessage(ChatColor.GREEN+GoXChat.chat("linking success"));
+	}
+	
+	private void executeOnesidedLink(Player player, String[] args) throws Exception {
+		
+		String id = args[2].toLowerCase();
+		GoXDirection dir = new GoXDirection(args[1]);
 		
 		Location location = player.getLocation();
 		GoXNode from = GoXMap.GetNode(location);
@@ -446,38 +432,39 @@ public class GoM implements CommandExecutor {
 		}
 		
 		player.sendMessage(ChatColor.YELLOW+GoXChat.chat("linking"));
-		try {
-			from.setLink(dir, to);
-		}
-		catch (Exception e) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
-			return;
-		}
+		
+		from.setLink(dir, to);
+		
 		player.sendMessage(ChatColor.GREEN+GoXChat.chat("linking success"));
 	}
 	
-	private void executeInfo(Player player, String[] args) {
-		Location location = player.getLocation();
-		GoXNode node = GoXMap.GetNode(location);
-		if (node != null) {
-			GoXChat.fancyNodeExtended(player, node);
+	private void executeInfo(Player player, String[] args) throws Exception {
+		if (args.length > 1) {
+			GoXNode node = GoXMap.GetNode(args[1]);
+			if (node != null) {
+				GoXChat.fancyNodeExtended(player, node);
+			}
+			else {
+				player.sendMessage(ChatColor.RED+GoXChat.chat("no such node"));
+			}
 		}
 		else {
-			player.sendMessage(ChatColor.RED+GoXChat.chat("stand over"));
+			Location location = player.getLocation();
+			GoXNode node = GoXMap.GetNode(location);
+			if (node != null) {
+				GoXChat.fancyNodeExtended(player, node);
+			}
+			else {
+				player.sendMessage(ChatColor.RED+GoXChat.chat("stand over"));
+			}
 		}
 	}
 	
-	private void executeFindpath(Player player, String[] args) {
-		try {
-			GoXPath path = GoXMap.FindPath(args[1], args[2]);
-			if (path == null) {
-				throw new Exception("null path");
-			}
-			player.sendMessage(ChatColor.GREEN + path.toString());
+	private void executeFindpath(Player player, String[] args) throws Exception {
+		GoXPath path = GoXMap.FindPath(args[1], args[2]);
+		if (path == null) {
+			throw new GoXException("null path");
 		}
-		catch (Exception e) {
-			player.sendMessage(ChatColor.RED + GoXChat.chat("fail reason") + ChatColor.RED + e.getMessage());
-			return;
-		}
+		player.sendMessage(ChatColor.GREEN + path.toString());
 	}
 }

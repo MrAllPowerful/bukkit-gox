@@ -25,7 +25,7 @@ public class GoXCart {
 	}
 
 	public boolean hasPassenger() {
-		Entity passenger = cart.getPassenger();
+		Entity passenger = cart.getPassengers().get(0);
 		if (passenger == null || !(passenger instanceof LivingEntity)) {
 			return false;
 		}
@@ -33,7 +33,7 @@ public class GoXCart {
 	}
 	
 	public boolean hasPlayer() {
-		Entity passenger = cart.getPassenger();
+		Entity passenger = cart.getPassengers().get(0);
 		if (passenger == null || !(passenger instanceof Player)) {
 			return false;
 		}

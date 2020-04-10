@@ -38,7 +38,7 @@ public class GoXMovement implements Listener {
 		}
 		
 		Minecart cart = (Minecart)e.getVehicle();
-		Player player = (Player) cart.getPassenger();
+		Player player = (Player) cart.getPassengers().get(0);
 		GoXPlayer gp = new GoXPlayer(player, plugin);
 		GoXCart gc = new GoXCart(cart, plugin);
 		

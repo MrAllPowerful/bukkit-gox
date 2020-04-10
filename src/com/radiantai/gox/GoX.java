@@ -70,8 +70,8 @@ public class GoX extends JavaPlugin {
 		getConfig().options().copyDefaults(true);
 		saveConfig();
 		cartMaxSpeed = getConfig().getConfigurationSection("config").getDouble("cart velocity multiplier");
-		nodeBlock = Material.values()[getConfig().getConfigurationSection("config").getInt("node block")];
-		stationBlock = Material.values()[getConfig().getConfigurationSection("config").getInt("station block")];
+		nodeBlock = Material.valueOf(getConfig().getConfigurationSection("config").getString("node block"));
+		stationBlock = Material.valueOf(getConfig().getConfigurationSection("config").getString("station block"));
 	}
 	
 	public void scheduleBackup() {

@@ -79,8 +79,8 @@ lang:
       rename success: "Renamed successfully!"
       different worlds: "You cannot perform any actions with the nodes from different worlds!"
 config:
-   node block: 45
-   station block: 87
+   node block: BRICKS
+   station block: NETHERRACK
    cart velocity multiplier: 1.1
    prohibited stations:
       - "cancel"

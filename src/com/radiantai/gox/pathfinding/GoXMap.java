@@ -198,7 +198,7 @@ public class GoXMap {
 		if (from.getId().equals(to.getId())) {
 			throw new GoXException(GoXChat.chat("to itself"));
 		}
-		if (from.getWorld().equals(to.getWorld())) {
+		if (!from.getWorld().equals(to.getWorld())) {
 			throw new GoXException(GoXChat.chat("different worlds"));
 		}
 		from.setLink(fromDir, to);
@@ -212,7 +212,7 @@ public class GoXMap {
 		if (from.getId().equals(to.getId())) {
 			throw new GoXException(GoXChat.chat("to itself"));
 		}
-		if (from.getWorld().equals(to.getWorld())) {
+		if (!from.getWorld().equals(to.getWorld())) {
 			throw new GoXException(GoXChat.chat("different worlds"));
 		}
 		from.setLink(fromDir, to);

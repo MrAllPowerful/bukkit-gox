@@ -140,7 +140,7 @@ public class GoXNode {
 		if (this.getId().equals(to.getId())) {
 			throw new GoXException(GoXChat.chat("to itself"));
 		}
-		if (getWorld().equals(to.getWorld())) {
+		if (!getWorld().equals(to.getWorld())) {
 			throw new GoXException(GoXChat.chat("different worlds"));
 		}
 		if (this.getZ()==to.getZ()) {
@@ -176,7 +176,7 @@ public class GoXNode {
 		if (node != null && id.equals(node.getId())) {
 			throw new GoXException(GoXChat.chat("to itself"));
 		}
-		if (getWorld().equals(node.getWorld())) {
+		if (!getWorld().equals(node.getWorld())) {
 			throw new GoXException(GoXChat.chat("different worlds"));
 		}
 		switch (dir.getDir()) {

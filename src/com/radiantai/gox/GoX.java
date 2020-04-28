@@ -13,8 +13,12 @@ import com.radiantai.gox.commands.Go;
 import com.radiantai.gox.listeners.GoXAddNode;
 import com.radiantai.gox.listeners.GoXAddStation;
 import com.radiantai.gox.listeners.GoXBreak;
+import com.radiantai.gox.listeners.GoXCartDestroy;
+import com.radiantai.gox.listeners.GoXCartRecycler;
+import com.radiantai.gox.listeners.GoXDispenseCart;
 import com.radiantai.gox.listeners.GoXLeave;
-import com.radiantai.gox.listeners.GoXMovement;
+import com.radiantai.gox.listeners.GoXPathMovement;
+import com.radiantai.gox.listeners.GoXPlaceCart;
 import com.radiantai.gox.listeners.GoXSit;
 import com.radiantai.gox.pathfinding.GoXMap;
 import com.radiantai.gox.schedule.GoXMapBackup;
@@ -27,6 +31,7 @@ public class GoX extends JavaPlugin {
 	private Material nodeBlock;
 	private Material stationBlock;
 	private double cartMaxSpeed;
+	private int cartTicksToLive;
 	
 	public void onEnable() {
 		bukkitLogger = getLogger();
@@ -53,12 +58,16 @@ public class GoX extends JavaPlugin {
 
 	private void registerEvents() {
 		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvents(new GoXMovement(this), this);
+		pm.registerEvents(new GoXPathMovement(this), this);
 		pm.registerEvents(new GoXAddNode(this), this);
 		pm.registerEvents(new GoXAddStation(this), this);
 		pm.registerEvents(new GoXBreak(this), this);
 		pm.registerEvents(new GoXSit(this), this);
 		pm.registerEvents(new GoXLeave(this), this);
+		pm.registerEvents(new GoXDispenseCart(this), this);
+		pm.registerEvents(new GoXPlaceCart(this), this);
+		pm.registerEvents(new GoXCartDestroy(this), this);
+		pm.registerEvents(new GoXCartRecycler(this), this);
 	}
 
 	public void onDisable() {
@@ -72,6 +81,7 @@ public class GoX extends JavaPlugin {
 		cartMaxSpeed = getConfig().getConfigurationSection("config").getDouble("cart velocity multiplier");
 		nodeBlock = Material.valueOf(getConfig().getConfigurationSection("config").getString("node block"));
 		stationBlock = Material.valueOf(getConfig().getConfigurationSection("config").getString("station block"));
+		cartTicksToLive = getConfig().getConfigurationSection("config").getInt("empty cart ticks live");
 	}
 	
 	public void scheduleBackup() {
@@ -87,5 +97,8 @@ public class GoX extends JavaPlugin {
 	}
 	public double getCartMaxSpeed() {
 		return cartMaxSpeed;
+	}
+	public int getCartTicksToLive() {
+		return cartTicksToLive;
 	}
 }

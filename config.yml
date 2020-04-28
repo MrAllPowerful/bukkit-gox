@@ -82,6 +82,7 @@ config:
    node block: BRICKS
    station block: NETHERRACK
    cart velocity multiplier: 1.1
+   empty cart ticks live: 200
    prohibited stations:
       - "cancel"
       - "current"

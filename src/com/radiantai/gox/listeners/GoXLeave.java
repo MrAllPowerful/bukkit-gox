@@ -33,7 +33,15 @@ public class GoXLeave implements Listener {
 		
 		Player player = (Player) e.getExited();
 		
-		new GoXPlayer(player, plugin).resetPath();
+		GoXPlayer gp = new GoXPlayer(player, plugin);
+		
+		if (gp.getDestination() != null) {
+			gc.destroyAndReturn();
+			gp.resetPath();
+		}
+		else {
+			gc.setTicksWhenleft(cart.getTicksLived());
+		}
 		
 	}
 }

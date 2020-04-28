@@ -1,12 +1,13 @@
 package com.radiantai.gox.structures;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
@@ -24,20 +25,12 @@ public class GoXCart {
 		return cart;
 	}
 
-	public boolean hasPassenger() {
-		Entity passenger = cart.getPassenger();
-		if (passenger == null || !(passenger instanceof LivingEntity)) {
-			return false;
-		}
-		return true;
-	}
-	
-	public boolean hasPlayer() {
+	public Player getPlayer() {
 		Entity passenger = cart.getPassenger();
 		if (passenger == null || !(passenger instanceof Player)) {
-			return false;
+			return null;
 		}
-		return true;
+		return (Player) passenger;
 	}
 	
 	public boolean isOnRails() {
@@ -72,5 +65,67 @@ public class GoXCart {
 	
 	public boolean isCartOverBlock(Material material) {
 		return cart.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == material;
+	}
+	
+	public void remove() {
+		cart.remove();
+	}
+	
+	public void setTicksWhenleft(int ticks) {
+		if (ticks < 0) {
+			if (cart.hasMetadata("go_tickswhenleft")) {
+				cart.removeMetadata("go_tickswhenleft", plugin);
+			}
+		}
+		else {
+			cart.setMetadata("go_tickswhenleft", new FixedMetadataValue(plugin, ticks));
+		}
+	}
+	
+	public int getTicksWhenleft() {
+		int result = -1;
+		if (cart.hasMetadata("go_tickswhenleft")) {
+			result = cart.getMetadata("go_tickswhenleft").get(0).asInt();
+			if (result < 0) {
+				cart.removeMetadata("go_tickswhenleft", plugin);
+			}
+		}
+		return result;
+	}
+	
+	public void setOwner(IGoXCartOwner owner) {
+		if (owner==null) {
+			if (cart.hasMetadata("go_playerowner")) {
+				cart.removeMetadata("go_destination", plugin);
+			}
+		}
+		else {
+			cart.setMetadata("go_destination", new FixedMetadataValue(plugin, owner));
+		}
+	}
+	
+	public IGoXCartOwner getOwner() {
+		IGoXCartOwner result = null;
+		if (cart.hasMetadata("go_destination")) {
+			result = (IGoXCartOwner) cart.getMetadata("go_destination").get(0).value();
+			if (result == null) {
+				cart.removeMetadata("go_destination", plugin);
+			}
+		}
+		return result;
+	}
+	
+	public void destroyAndReturn() {
+		IGoXCartOwner owner = getOwner();
+		if (owner != null) {
+			owner.returnCart();
+		}
+		remove();
+	}
+	
+	public static Minecart createCart(Location loc) {
+		Minecart cart = null;
+		cart = loc.getWorld().spawn(loc, Minecart.class);
+		return cart;
 	}
 }

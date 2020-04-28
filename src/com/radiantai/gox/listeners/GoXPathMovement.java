@@ -2,7 +2,6 @@ package com.radiantai.gox.listeners;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Minecart;
@@ -10,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.radiantai.gox.GoX;
 import com.radiantai.gox.chat.GoXChat;
@@ -22,11 +20,11 @@ import com.radiantai.gox.pathfinding.GoXUtils;
 import com.radiantai.gox.structures.GoXCart;
 import com.radiantai.gox.structures.GoXPlayer;
 
-public class GoXMovement implements Listener {
+public class GoXPathMovement implements Listener {
 	
 	private GoX plugin;
 	
-	public GoXMovement(GoX plugin) {
+	public GoXPathMovement(GoX plugin) {
 		this.plugin = plugin;
 	}
 	
@@ -57,8 +55,7 @@ public class GoXMovement implements Listener {
 				if (drop != null) {
 					player.leaveVehicle();
 					player.teleport(drop);
-					cart.remove();
-					player.getInventory().addItem(new ItemStack(Material.MINECART));
+					gc.destroyAndReturn();
 				}
 			}
 			if (node instanceof GoXStation) {
@@ -115,7 +112,7 @@ public class GoXMovement implements Listener {
 		}
 		Minecart cart = (Minecart)e.getVehicle();
 		GoXCart gc = new GoXCart(cart, plugin);
-		if (!gc.isOnRails() || !gc.hasPlayer()) {
+		if (!gc.isOnRails() || gc.getPlayer() == null) {
 			return false;
 		}
 		return true;

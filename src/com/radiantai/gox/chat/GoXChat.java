@@ -166,9 +166,9 @@ public class GoXChat {
 	}
 	
 	public static void estimatedTime(Player p, GoXPath path) {
-		double estimated = path.getDistance()/7.5/goxplugin.getCartMaxSpeed();
-		int minutes = (int) Math.floor(estimated/60.0);
-		int seconds = (int) Math.ceil(estimated-minutes*60.0);
+		double estimated = path.getDistance()/7.0/goxplugin.getCartMaxSpeed();
+		int minutes = (int) Math.ceil(estimated)/60;
+		int seconds = (int) Math.floor(estimated-minutes*60);
 		String message = ChatColor.GREEN + chat("estimated time")+": "+ChatColor.WHITE;
 		message += minutes==0 ? "" : minutes+" "+chat("minutes")+" ";
 		message += seconds==0 ? "" : seconds+" "+chat("seconds");

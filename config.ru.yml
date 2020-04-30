@@ -81,6 +81,7 @@ config:
   node block: 45
   station block: 87
   empty cart ticks live: 200
+  chest place cart: true
   cart velocity multiplier: 1.1
   prohibited stations:
   - cancel

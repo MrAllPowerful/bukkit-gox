@@ -28,7 +28,7 @@ public class GoXChest {
 		Minecart cart = null;
 		DirectionalContainer data = (DirectionalContainer) chest.getState().getData();
 		Block onto = chest.getRelative(data.getFacing());
-		cart = GoXCart.createCart(onto.getLocation().clone().add(new Vector(0.5,0.5,0.5)));
+		cart = GoXCart.createCart(onto.getLocation().clone().add(new Vector(0.5,0,0.5)));
 		return cart;
 	}
 	

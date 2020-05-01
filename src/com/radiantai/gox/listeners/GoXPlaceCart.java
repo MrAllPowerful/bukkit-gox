@@ -44,7 +44,7 @@ public class GoXPlaceCart implements Listener {
 		
 		int slotNumber = e.getPlayer().getInventory().getHeldItemSlot();
 		e.getPlayer().getInventory().setItem(slotNumber, null);
-		Minecart cart = GoXCart.createCart(block.getLocation().add(new Vector(0.5,0.5,0.5)));
+		Minecart cart = GoXCart.createCart(block.getLocation().add(new Vector(0.5,0,0.5)));
 		if (cart != null) {
 			GoXCart gc = new GoXCart(cart, plugin);
 			gc.setOwner(new GoXCartPlayerOwner(e.getPlayer().getUniqueId()));

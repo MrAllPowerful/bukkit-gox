@@ -24,7 +24,7 @@ public class GoXDispenser {
 		Minecart cart = null;
 		DirectionalContainer data = (DirectionalContainer) dispenser.getState().getData();
 		Block onto = dispenser.getRelative(data.getFacing());
-		cart = GoXCart.createCart(onto.getLocation().clone().add(new Vector(0.5,0.5,0.5)));
+		cart = GoXCart.createCart(onto.getLocation().clone().add(new Vector(0.5,0,0.5)));
 		return cart;
 	}
 	

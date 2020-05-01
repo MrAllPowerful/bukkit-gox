@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
 import com.radiantai.gox.chat.GoXChat;
@@ -51,12 +52,15 @@ public class GoXPathMovement implements Listener {
 			player.sendMessage(ChatColor.YELLOW+GoXChat.chat("arrived")+":");
 			gc.stopCart();
 			if (node instanceof GoXStation) {
+				player.leaveVehicle();
 				Location drop = ((GoXStation) node).getDropPoint();
 				if (drop != null) {
-					player.leaveVehicle();
 					player.teleport(drop);
-					gc.destroyAndReturn();
 				}
+				else {
+					player.teleport(node.getLocation().clone().add(new Vector(0.5,1.1,0.5)));
+				}
+				gc.destroyAndReturn();
 			}
 			if (node instanceof GoXStation) {
 				GoXChat.fancyStationCompact(player,(GoXStation) node);

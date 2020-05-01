@@ -15,6 +15,7 @@ import com.radiantai.gox.listeners.GoXAddStation;
 import com.radiantai.gox.listeners.GoXBreak;
 import com.radiantai.gox.listeners.GoXCartDestroy;
 import com.radiantai.gox.listeners.GoXCartRecycler;
+import com.radiantai.gox.listeners.GoXChestPlaceCart;
 import com.radiantai.gox.listeners.GoXDispenseCart;
 import com.radiantai.gox.listeners.GoXLeave;
 import com.radiantai.gox.listeners.GoXPathMovement;
@@ -26,15 +27,20 @@ import com.radiantai.gox.schedule.GoXMapBackup;
 public class GoX extends JavaPlugin {
 	
 	private Logger bukkitLogger;
+	private PluginManager pm;
+	
 	private String mapFilePath;
 	private String mapFileName;
 	private Material nodeBlock;
 	private Material stationBlock;
 	private double cartMaxSpeed;
 	private int cartTicksToLive;
+	private boolean chestPlaceCart;
 	
 	public void onEnable() {
 		bukkitLogger = getLogger();
+		
+		pm = getServer().getPluginManager();
 		
 		loadConfig();
 		registerEvents();
@@ -57,7 +63,6 @@ public class GoX extends JavaPlugin {
 	}
 
 	private void registerEvents() {
-		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new GoXPathMovement(this), this);
 		pm.registerEvents(new GoXAddNode(this), this);
 		pm.registerEvents(new GoXAddStation(this), this);
@@ -68,6 +73,10 @@ public class GoX extends JavaPlugin {
 		pm.registerEvents(new GoXPlaceCart(this), this);
 		pm.registerEvents(new GoXCartDestroy(this), this);
 		pm.registerEvents(new GoXCartRecycler(this), this);
+		
+		if (chestPlaceCart) {
+			pm.registerEvents(new GoXChestPlaceCart(this), this);
+		}
 	}
 
 	public void onDisable() {
@@ -82,6 +91,7 @@ public class GoX extends JavaPlugin {
 		cartTicksToLive = getConfig().getConfigurationSection("config").getInt("empty cart ticks live");
 		nodeBlock = Material.values()[getConfig().getConfigurationSection("config").getInt("node block")];
 		stationBlock = Material.values()[getConfig().getConfigurationSection("config").getInt("station block")];
+		chestPlaceCart = getConfig().getConfigurationSection("config").getBoolean("chest place cart");
 	}
 	
 	public void scheduleBackup() {

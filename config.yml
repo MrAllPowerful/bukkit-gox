@@ -83,6 +83,7 @@ config:
    station block: 87
    cart velocity multiplier: 1.1
    empty cart ticks live: 200
+   chest place cart: true
    prohibited stations:
       - "cancel"
       - "current"

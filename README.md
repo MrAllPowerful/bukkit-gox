@@ -5,7 +5,7 @@ Have you ever wanted to implement automatic subway system on your Bukkit/Spigot 
 Check this out:
 
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/q3jbcEKx4K4/0.jpg)](https://youtu.be/q3jbcEKx4K4)
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/JnjLzK5SyNo/0.jpg)](https://youtu.be/JnjLzK5SyNo)
 ### How to
 [English](https://docs.google.com/document/d/1DwT7SrAo7_u1hZobe1x3M5JSLxIFrhDIB6SPigj1Z8U/edit?usp=sharing)
 [Russian](https://docs.google.com/document/d/1mGCW342E2ayDt6VBnTHX8Dz95mw7iQM83N2-QZuvunQ/edit?usp=sharing)

@@ -40,6 +40,9 @@ import com.radiantai.gox.structures.GoXCart;
 						if (ticksAfterLeave >= 0 && maxTicks<ticksLived-ticksAfterLeave) {
 							gc.destroyAndReturn();
 						}
+						else if (ticksAfterLeave < 0 && ticksLived > maxTicks) {
+							gc.destroyAndReturn();
+						}
 					}
 				}
 			}

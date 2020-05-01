@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
@@ -119,6 +120,10 @@ public class GoXCart {
 		IGoXCartOwner owner = getOwner();
 		if (owner != null) {
 			owner.returnCart();
+		}
+		else {
+			Location loc = cart.getLocation();
+			loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.MINECART));
 		}
 		remove();
 	}

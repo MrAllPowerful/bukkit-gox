@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Minecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -23,6 +24,11 @@ public class GoXPlaceCart implements Listener {
 	
 	@EventHandler
 	public void onCartPlace(PlayerInteractEvent e) {
+		
+		if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {
+			return;
+		}
+		
 		Block block = e.getClickedBlock();
 		ItemStack item = e.getItem();
 		
@@ -38,7 +44,7 @@ public class GoXPlaceCart implements Listener {
 		
 		int slotNumber = e.getPlayer().getInventory().getHeldItemSlot();
 		e.getPlayer().getInventory().setItem(slotNumber, null);
-		Minecart cart = GoXCart.createCart(block.getLocation().add(new Vector(0.5,0.5,0.5)));
+		Minecart cart = GoXCart.createCart(block.getLocation().add(new Vector(0.5,0,0.5)));
 		if (cart != null) {
 			GoXCart gc = new GoXCart(cart, plugin);
 			gc.setOwner(new GoXCartPlayerOwner(e.getPlayer().getUniqueId()));

@@ -1,7 +1,12 @@
 package com.radiantai.gox.pathfinding;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 import com.radiantai.gox.chat.GoXChat;
 import com.radiantai.gox.structures.GoXPlayer;
@@ -64,5 +69,16 @@ public class GoXUtils {
 		newLoc.setY(location.getBlockY());
 		newLoc.setZ(location.getBlockZ());
 		return newLoc;
+	}
+	
+	public static List<Block> getFacingBlocks(Block block) {
+		List<Block> list = new LinkedList<Block>();
+		list.add(block.getRelative(BlockFace.NORTH));
+		list.add(block.getRelative(BlockFace.EAST));
+		list.add(block.getRelative(BlockFace.SOUTH));
+		list.add(block.getRelative(BlockFace.WEST));
+		list.add(block.getRelative(BlockFace.UP));
+		list.add(block.getRelative(BlockFace.DOWN));
+		return list;
 	}
 }

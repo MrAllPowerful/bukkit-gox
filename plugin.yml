@@ -1,7 +1,7 @@
 main: com.radiantai.gox.GoX
-version: 1.5_beta
+version: 1.6
 name: GoX
-api-version: 1.15
+api-version: 1.13
 
 commands:
    go:

@@ -7,31 +7,30 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Minecart;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.DirectionalContainer;
+import org.bukkit.material.Directional;
 import org.bukkit.util.Vector;
 
 import com.radiantai.gox.GoX;
 
 public class GoXDispenser {
 	
-	private Dispenser dispenser;
+	private Block dispenser;
 	
-	public GoXDispenser(Dispenser dispenser) {
-		super();
+	public GoXDispenser(Block dispenser) {
 		this.dispenser = dispenser;
 	}
 	
 	public Minecart placeCart() {
 		Minecart cart = null;
-		DirectionalContainer data = (DirectionalContainer) dispenser.getData();
-		Block onto = dispenser.getBlock().getRelative(data.getFacing());
-		cart = GoXCart.createCart(onto.getLocation().add(new Vector(0.5,0.5,0.5)));
+		Directional data = (Directional) dispenser.getState().getData();
+		Block onto = dispenser.getRelative(data.getFacing());
+		cart = GoXCart.createCart(onto.getLocation().clone().add(new Vector(0.5,0,0.5)));
 		return cart;
 	}
 	
 	public boolean isFacingRails() {
-		DirectionalContainer data = (DirectionalContainer) dispenser.getData();
-		Block onto = dispenser.getBlock().getRelative(data.getFacing());
+		Directional data = (Directional) dispenser.getState().getData();
+		Block onto = dispenser.getRelative(data.getFacing());
 		return GoXRail.isRails(onto);
 	}
 	
@@ -40,7 +39,7 @@ public class GoXDispenser {
             @Override
             public void run()
             {
-            	Inventory inventory = dispenser.getInventory();
+            	Inventory inventory = ((Dispenser) dispenser.getState()).getInventory();
         		int cartPos = inventory.first(new ItemStack(Material.MINECART));
         		if (cartPos >= 0) {
         			inventory.setItem(cartPos, null);
